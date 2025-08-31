@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
-import { geocodeAddress, LocationIQError } from '@/lib/locationiq'
+import { geocodeAddress, LocationIQError } from '@/lib/googleMaps'
 
 // GET - Fetch vendor profile
 export async function GET(request: NextRequest) {

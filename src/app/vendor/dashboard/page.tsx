@@ -105,12 +105,11 @@ export default function VendorDashboard() {
     title: '',
     start_date: '',
     end_date: '',
-    discount_type: 'percentage',
-    discount_value: '',
     terms_conditions: ''
   });
   const [isCreatingOffer, setIsCreatingOffer] = useState(false);
   const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null);
+  const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -178,6 +177,10 @@ export default function VendorDashboard() {
 
     try {
       // Only send the fields that are actually editable
+      const uniqueTags = Array.from(new Set((formData.tags || [])
+        .map(t => (t || '').toString().trim())
+        .filter(Boolean)))
+        .slice(0, 3);
       const updateData = {
         name: formData.name,
         phone: formData.phone,
@@ -186,7 +189,7 @@ export default function VendorDashboard() {
         website: formData.website,
         about: formData.about,
         vendor_type: formData.vendor_type,
-        tags: formData.tags,
+        tags: uniqueTags,
       };
 
       console.log('Sending update data:', updateData);
@@ -293,19 +296,18 @@ export default function VendorDashboard() {
 
   // Handle adding tags
   const handleAddTag = () => {
-    if (tagInput.trim() && formData.tags && !formData.tags.includes(tagInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...(prev.tags || []), tagInput.trim()]
-      }));
-      setTagInput('');
-    } else if (tagInput.trim() && !formData.tags) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [tagInput.trim()]
-      }));
-      setTagInput('');
-    }
+    const newTag = tagInput.trim();
+    if (!newTag) return;
+    setFormData(prev => {
+      const existing = prev.tags || [];
+      if (existing.includes(newTag)) return prev;
+      if (existing.length >= 3) {
+        setMessage({ type: 'error', text: 'You can add up to 3 tags only.' });
+        return prev;
+      }
+      return { ...prev, tags: [...existing, newTag] };
+    });
+    setTagInput('');
   };
 
   // Handle removing tags
@@ -342,21 +344,12 @@ export default function VendorDashboard() {
 
     try {
       // Validate form data
-      if (!offerFormData.title || !offerFormData.start_date || !offerFormData.end_date || !offerFormData.discount_value) {
+      if (!offerFormData.title || !offerFormData.start_date || !offerFormData.end_date) {
         setMessage({ type: 'error', text: 'Please fill in all required fields.' });
         return;
       }
 
-      const discountValue = parseFloat(offerFormData.discount_value as string);
-      if (isNaN(discountValue) || discountValue <= 0) {
-        setMessage({ type: 'error', text: 'Please enter a valid discount value.' });
-        return;
-      }
-
-      if (offerFormData.discount_type === 'percentage' && discountValue > 100) {
-        setMessage({ type: 'error', text: 'Percentage discount cannot exceed 100%.' });
-        return;
-      }
+      // No numeric discount value used
 
       // Validate dates
       const startDate = new Date(offerFormData.start_date);
@@ -374,9 +367,8 @@ export default function VendorDashboard() {
         return;
       }
 
-      const offerData = {
+      const offerData: any = {
         ...offerFormData,
-        discount_value: discountValue,
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString()
       };
@@ -399,8 +391,6 @@ export default function VendorDashboard() {
           title: '',
           start_date: '',
           end_date: '',
-          discount_type: 'percentage',
-          discount_value: '',
           terms_conditions: ''
         });
         // Reload offers
@@ -833,39 +823,7 @@ export default function VendorDashboard() {
                   />
                 </div>
 
-                {/* Discount Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Discount Type *
-                  </label>
-                  <select
-                    name="discount_type"
-                    value={offerFormData.discount_type}
-                    onChange={handleOfferFormChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  >
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Amount ($)</option>
-                  </select>
-                </div>
-
-                {/* Discount Value */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Discount Value *
-                  </label>
-                  <input
-                    type="number"
-                    name="discount_value"
-                    value={offerFormData.discount_value}
-                    onChange={handleOfferFormChange}
-                    placeholder={offerFormData.discount_type === 'percentage' ? '20' : '10.00'}
-                    min="0"
-                    max={offerFormData.discount_type === 'percentage' ? '100' : undefined}
-                    step={offerFormData.discount_type === 'percentage' ? '1' : '0.01'}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                </div>
+                {/* Offer Type removed */}
 
                 {/* Start Date */}
                 <div>
@@ -942,7 +900,12 @@ export default function VendorDashboard() {
               offers.map((offer) => (
                 <div key={offer.id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-                    <h4 className="font-medium text-gray-900 text-sm sm:text-base">{offer.title}</h4>
+                    <h4 className="font-medium text-gray-900 text-sm sm:text-base flex items-center gap-1">
+                      {offer.title}
+                      {offer.featured && (
+                        <span title="Featured" aria-label="Featured" className="text-yellow-500">★</span>
+                      )}
+                    </h4>
                     <div className="flex items-center gap-2 self-start sm:self-auto">
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         offer.status === 'active' 
@@ -954,6 +917,40 @@ export default function VendorDashboard() {
                         {offer.status}
                       </span>
                       <button
+                        onClick={async () => {
+                          if (!offer.id || !session) return;
+                          setTogglingFeaturedId(offer.id);
+                          try {
+                            const token = await refreshTokenIfNeeded();
+                            if (!token) return;
+                            const res = await fetch('/api/vendor/offers', {
+                              method: 'PATCH',
+                              headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({ offerId: offer.id, featured: !offer.featured })
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              setOffers(prev => prev.map(o => o.id === offer.id ? { ...o, featured: data.data.featured } : o));
+                            } else {
+                              setMessage({ type: 'error', text: data.error || 'Failed to update featured status.' });
+                            }
+                          } catch (e) {
+                            console.error(e);
+                            setMessage({ type: 'error', text: 'Network error updating featured status.' });
+                          } finally {
+                            setTogglingFeaturedId(null);
+                          }
+                        }}
+                        disabled={togglingFeaturedId === offer.id}
+                        className="text-yellow-600 hover:text-yellow-800 text-sm px-2 py-1 rounded hover:bg-yellow-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={offer.featured ? 'Unfeature' : 'Feature'}
+                      >
+                        {togglingFeaturedId === offer.id ? 'Updating...' : (offer.featured ? 'Unfeature' : 'Feature')}
+                      </button>
+                      <button
                         onClick={() => offer.id && handleDeleteOffer(offer.id)}
                         disabled={deletingOfferId === offer.id}
                         className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -964,10 +961,7 @@ export default function VendorDashboard() {
                     </div>
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
-                    <p>
-                      <strong>Discount:</strong> {offer.discount_value}
-                      {offer.discount_type === 'percentage' ? '%' : '$'} off
-                    </p>
+                    {/* Discount details removed */}
                     <p>
                       <strong>Valid:</strong> {new Date(offer.start_date).toLocaleDateString()} - {new Date(offer.end_date).toLocaleDateString()}
                     </p>

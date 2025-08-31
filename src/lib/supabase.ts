@@ -56,7 +56,6 @@ export interface VendorSignupData {
 }
 
 // Offer related types
-export type DiscountType = 'percentage' | 'fixed'
 export type OfferStatus = 'active' | 'expired' | 'paused'
 
 export interface Offer {
@@ -65,19 +64,17 @@ export interface Offer {
   title: string
   start_date: string
   end_date: string
-  discount_type: DiscountType
-  discount_value: number
+  discount_value?: number
   terms_conditions?: string
   status?: OfferStatus
   created_at?: string
   updated_at?: string
+  featured?: boolean
 }
 
 export interface OfferFormData {
   title: string
   start_date: string
   end_date: string
-  discount_type: DiscountType
-  discount_value: number | string
   terms_conditions: string
 }

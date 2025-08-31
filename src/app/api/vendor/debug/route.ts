@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { geocodeAddress, getAddressAutocomplete, LocationIQError } from '@/lib/locationiq'
+import { geocodeAddress, getAddressAutocomplete, LocationIQError } from '@/lib/googleMaps'
 
 // Debug endpoint to test LocationIQ geocoding
 export async function GET(request: NextRequest) {

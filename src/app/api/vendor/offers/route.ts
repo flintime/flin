@@ -28,8 +28,18 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Find vendor by user_id
-    const { data: vendorData, error: vendorError } = await supabase
+    // Create authenticated Supabase client with user token for RLS
+    const userSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: { autoRefreshToken: false },
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      }
+    )
+
+    // Find vendor by user_id (RLS-safe)
+    const { data: vendorData, error: vendorError } = await userSupabase
       .from('vendors')
       .select('id')
       .eq('user_id', userData.user.id)
@@ -98,8 +108,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find vendor by user_id
-    const { data: vendorData, error: vendorError } = await supabase
+    // Create authenticated Supabase client with user token for RLS
+    const userSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: { autoRefreshToken: false },
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      }
+    )
+
+    // Find vendor by user_id using authenticated client
+    const { data: vendorData, error: vendorError } = await userSupabase
       .from('vendors')
       .select('id')
       .eq('user_id', userData.user.id)
@@ -116,8 +136,8 @@ export async function POST(request: NextRequest) {
     // Get the offer data
     const offerData = await request.json()
     
-    // Validate required fields
-    const requiredFields = ['title', 'start_date', 'end_date', 'discount_type', 'discount_value']
+    // Validate required fields (discount fields removed)
+    const requiredFields = ['title', 'start_date', 'end_date']
     for (const field of requiredFields) {
       if (!offerData[field]) {
         return NextResponse.json(
@@ -127,29 +147,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Validate discount type
-    if (!['percentage', 'fixed'].includes(offerData.discount_type)) {
-      return NextResponse.json(
-        { error: 'Invalid discount type. Must be "percentage" or "fixed"' },
-        { status: 400 }
-      )
-    }
-
-    // Validate discount value
-    const discountValue = parseFloat(offerData.discount_value)
-    if (isNaN(discountValue) || discountValue <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid discount value' },
-        { status: 400 }
-      )
-    }
-
-    if (offerData.discount_type === 'percentage' && discountValue > 100) {
-      return NextResponse.json(
-        { error: 'Percentage discount cannot exceed 100%' },
-        { status: 400 }
-      )
-    }
+    // Deprecated discount fields are ignored server-side
 
     // Validate dates
     const startDate = new Date(offerData.start_date)
@@ -170,18 +168,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the offer
-    const { data: newOffer, error: createError } = await supabase
+    const insertPayload = {
+      vendor_id: vendorData.id,
+      title: offerData.title,
+      start_date: offerData.start_date,
+      end_date: offerData.end_date,
+      // discount_type removed
+      terms_conditions: offerData.terms_conditions || null,
+      status: 'active'
+    }
+
+    const { data: newOffer, error: createError } = await userSupabase
       .from('offers')
-      .insert({
-        vendor_id: vendorData.id,
-        title: offerData.title,
-        start_date: offerData.start_date,
-        end_date: offerData.end_date,
-        discount_type: offerData.discount_type,
-        discount_value: discountValue,
-        terms_conditions: offerData.terms_conditions || null,
-        status: 'active'
-      })
+      .insert(insertPayload)
       .select()
       .single()
 
@@ -308,6 +307,103 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     console.error('Error deleting offer:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+// PATCH - Toggle featured status on an offer
+export async function PATCH(request: NextRequest) {
+  try {
+    // Auth header
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Missing or invalid authorization header' },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.split(' ')[1]
+
+    // Verify user
+    const { data: userData, error: userError } = await supabase.auth.getUser(token)
+    if (userError || !userData.user) {
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      )
+    }
+
+    // Parse body
+    const { offerId, featured } = await request.json() as { offerId?: string, featured?: boolean }
+    if (!offerId || typeof featured !== 'boolean') {
+      return NextResponse.json(
+        { error: 'offerId and featured (boolean) are required' },
+        { status: 400 }
+      )
+    }
+
+    // Find vendor for this user
+    const { data: vendorData, error: vendorError } = await supabase
+      .from('vendors')
+      .select('id')
+      .eq('user_id', userData.user.id)
+      .single()
+
+    if (vendorError || !vendorData) {
+      return NextResponse.json(
+        { error: 'Vendor not found' },
+        { status: 404 }
+      )
+    }
+
+    // Authenticated client for RLS
+    const userSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: { autoRefreshToken: false },
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      }
+    )
+
+    // If setting to featured=true, first clear any existing featured offers for this vendor
+    if (featured) {
+      const { error: clearError } = await userSupabase
+        .from('offers')
+        .update({ featured: false })
+        .eq('vendor_id', vendorData.id)
+        .eq('featured', true)
+      if (clearError) {
+        return NextResponse.json(
+          { error: 'Failed to clear previous featured offer: ' + clearError.message },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Update featured flag (RLS ensures ownership)
+    const { data: updated, error: updateError } = await userSupabase
+      .from('offers')
+      .update({ featured })
+      .eq('id', offerId)
+      .eq('vendor_id', vendorData.id)
+      .select()
+      .single()
+
+    if (updateError) {
+      return NextResponse.json(
+        { error: 'Failed to update offer: ' + updateError.message },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({ success: true, data: updated })
+  } catch (error) {
+    console.error('Error updating featured status:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

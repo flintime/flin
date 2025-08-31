@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Block access to API routes
+Disallow: /api/
+
+# Block access to admin/vendor areas if needed
+Disallow: /vendor/
+
+# Allow all important pages
+Allow: /
+Allow: /local-offers
+Allow: /marketplace
+Allow: /housing
+Allow: /events
+
+# Sitemap
+Sitemap: https://flin.college/sitemap.xml
