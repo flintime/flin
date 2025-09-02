@@ -51,6 +51,11 @@ interface GoogleMapsResult {
   place_id: string;
   formatted_address: string;
   types: string[];
+  address_components?: Array<{
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }>;
 }
 
 interface GoogleMapsResponse {
