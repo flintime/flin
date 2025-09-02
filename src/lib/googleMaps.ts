@@ -33,6 +33,41 @@ export interface AutocompleteResult {
   };
 }
 
+// Google Maps API response types
+interface GoogleMapsGeometry {
+  location: {
+    lat: number;
+    lng: number;
+  };
+  location_type: string;
+  viewport: {
+    northeast: { lat: number; lng: number };
+    southwest: { lat: number; lng: number };
+  };
+}
+
+interface GoogleMapsResult {
+  geometry: GoogleMapsGeometry;
+  place_id: string;
+  formatted_address: string;
+  types: string[];
+}
+
+interface GoogleMapsResponse {
+  status: string;
+  results: GoogleMapsResult[];
+  error_message?: string;
+}
+
+interface GooglePlacesDetailsResponse {
+  status: string;
+  result?: {
+    formatted_address?: string;
+    geometry?: GoogleMapsGeometry;
+  };
+  error_message?: string;
+}
+
 export class LocationIQError extends Error {
   constructor(
     message: string,
@@ -59,7 +94,7 @@ export async function geocodeAddress(address: string): Promise<GeocodingResult> 
   try {
     const resp = await fetch(url, { method: 'GET' });
     if (!resp.ok) throw new LocationIQError(`Google Geocoding HTTP ${resp.status}`, resp.status);
-    const data: any = await resp.json();
+    const data: GoogleMapsResponse = await resp.json();
     const status: string = data.status;
     if (status === 'ZERO_RESULTS') throw new LocationIQError('Address not found', 404, 'NOT_FOUND');
     if (status === 'OVER_QUERY_LIMIT') throw new LocationIQError('Google API rate limit exceeded', 429, 'RATE_LIMIT');
@@ -103,7 +138,7 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
   try {
     const resp = await fetch(url, { method: 'GET' });
     if (!resp.ok) throw new LocationIQError(`Google Geocoding HTTP ${resp.status}`, resp.status);
-    const data: any = await resp.json();
+    const data: GoogleMapsResponse = await resp.json();
     const status: string = data.status;
     if (status === 'ZERO_RESULTS') throw new LocationIQError('Location not found', 404, 'NOT_FOUND');
     if (status === 'OVER_QUERY_LIMIT') throw new LocationIQError('Google API rate limit exceeded', 429, 'RATE_LIMIT');
@@ -141,7 +176,7 @@ export async function getAddressAutocomplete(query: string, limit: number = 5): 
   try {
     const resp = await fetch(url, { method: 'GET' });
     if (!resp.ok) return [];
-    const data: any = await resp.json();
+    const data: GoogleMapsResponse = await resp.json();
     if (data.status !== 'OK' || !Array.isArray(data.predictions)) return [];
     const items = data.predictions.slice(0, Math.min(limit, 10));
     // For autocomplete, we need to get place details for coordinates
@@ -151,7 +186,7 @@ export async function getAddressAutocomplete(query: string, limit: number = 5): 
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=formatted_address,geometry&key=${apiKey}`;
         const detailsResp = await fetch(detailsUrl);
         if (detailsResp.ok) {
-          const details: any = await detailsResp.json();
+          const details: GooglePlacesDetailsResponse = await detailsResp.json();
           if (details.status === 'OK' && details.result) {
             const loc = details.result.geometry?.location;
             const lat = Number(loc?.lat);

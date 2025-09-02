@@ -16,17 +16,6 @@ export async function GET(request: NextRequest) {
 
     // Extract the token
     const token = authHeader.split(' ')[1]
-    
-    // Verify the user with Supabase
-    const { data: userData, error: userError } = await supabase.auth.getUser(token)
-    
-    if (userError || !userData.user) {
-      console.error('Auth error:', userError)
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      )
-    }
 
     // Create authenticated Supabase client with user token for RLS
     const userSupabase = createClient(
@@ -37,6 +26,17 @@ export async function GET(request: NextRequest) {
         global: { headers: { Authorization: `Bearer ${token}` } }
       }
     )
+
+    // Verify the user with the authenticated client
+    const { data: userData, error: userError } = await userSupabase.auth.getUser()
+
+    if (userError || !userData.user) {
+      console.error('Auth error:', userError)
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      )
+    }
 
     // Find vendor by user_id (RLS-safe)
     const { data: vendorData, error: vendorError } = await userSupabase
@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Fetch offers for this vendor
-    const { data: offers, error: offersError } = await supabase
+    // Fetch offers for this vendor using authenticated client
+    const { data: offers, error: offersError } = await userSupabase
       .from('offers')
       .select('*')
       .eq('vendor_id', vendorData.id)

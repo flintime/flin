@@ -17,11 +17,16 @@ export default function VendorSignup() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [accountCreated, setAccountCreated] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       setMessage({ type: 'error', text: 'Passwords do not match!' });
       return;
@@ -57,20 +62,11 @@ export default function VendorSignup() {
       const data = await response.json();
 
       if (response.ok) {
-        const pin = data.data?.vendor_pin;
-        const successMessage = pin 
-          ? `Vendor account created successfully! Your unique vendor PIN is: ${pin}. Please save this PIN - you'll need it for business operations. You can now log in to your dashboard to complete your business profile.`
-          : 'Vendor account created successfully! Please check your email to verify your account.';
-        
-        setMessage({ type: 'success', text: successMessage });
-        // Reset form
-        setFormData({
-          businessName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          businessType: '',
-          agreeToTerms: false,
+        setAccountCreated(true);
+        setShowOtpInput(true);
+        setMessage({
+          type: 'success',
+          text: 'Account created successfully! Please check your email for the OTP verification code.'
         });
       } else {
         setMessage({ type: 'error', text: data.error || 'Failed to create vendor account' });
@@ -80,6 +76,93 @@ export default function VendorSignup() {
       setMessage({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      setMessage({ type: 'error', text: 'Please enter the OTP code.' });
+      return;
+    }
+
+    setIsVerifying(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/vendor/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          otp: otp.trim(),
+          type: 'signup'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const pin = data.data?.vendor?.vendor_pin;
+        setMessage({
+          type: 'success',
+          text: `Email verified successfully! Your unique vendor PIN is: ${pin}. Please save this PIN - you'll need it for business operations. You can now log in to your dashboard.`
+        });
+
+        // Reset form
+        setFormData({
+          businessName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          businessType: '',
+          agreeToTerms: false,
+        });
+        setOtp('');
+        setShowOtpInput(false);
+        setAccountCreated(false);
+      } else {
+        setMessage({ type: 'error', text: data.error || 'OTP verification failed' });
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setIsResending(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/vendor/resend-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({
+          type: 'success',
+          text: 'OTP code resent successfully! Please check your email.'
+        });
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to resend OTP' });
+      }
+    } catch (error) {
+      console.error('OTP resend error:', error);
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -129,7 +212,91 @@ export default function VendorSignup() {
 
       <div className="mt-8 sm:mt-12 mx-auto w-full max-w-md relative z-10">
         <div className="bg-white/80 backdrop-blur-sm py-6 px-4 sm:py-12 sm:px-8 border border-black/10 rounded-2xl glass-effect hover-lift">
-          <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+          {showOtpInput ? (
+            /* OTP Verification Form */
+            <div className="space-y-6 sm:space-y-8">
+              <div className="text-center">
+                <h3 className="text-lg sm:text-xl font-semibold text-black mb-2">
+                  Verify Your Email
+                </h3>
+                <p className="text-sm text-black/70">
+                  We've sent a 6-digit code to <strong>{formData.email}</strong>
+                </p>
+              </div>
+
+              {/* Message Display */}
+              {message && (
+                <div className={`p-4 rounded-lg ${
+                  message.type === 'success'
+                    ? 'bg-green-50 text-green-800 border border-green-200'
+                    : 'bg-red-50 text-red-800 border border-red-200'
+                }`}>
+                  {message.text}
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="otp" className="block text-sm font-medium text-black mb-2">
+                  Enter Verification Code *
+                </label>
+                <div className="relative">
+                  <input
+                    id="otp"
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-3 border border-black/20 rounded-lg placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base text-center text-2xl font-mono tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <button
+                  onClick={handleVerifyOtp}
+                  disabled={isVerifying || otp.length !== 6}
+                  className="flex-1 py-3 px-4 sm:py-4 sm:px-6 border border-transparent text-base sm:text-lg font-medium rounded-xl text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300 hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isVerifying ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Verifying...
+                    </>
+                  ) : (
+                    'Verify Code'
+                  )}
+                </button>
+
+                <button
+                  onClick={handleResendOtp}
+                  disabled={isResending}
+                  className="px-4 py-3 sm:px-6 sm:py-4 border border-black/20 text-base sm:text-lg font-medium rounded-xl text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300"
+                >
+                  {isResending ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-black inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    'Resend Code'
+                  )}
+                </button>
+              </div>
+
+              <div className="text-center text-sm text-black/60">
+                <p>Didn't receive the code? Check your spam folder or try resending.</p>
+              </div>
+            </div>
+          ) : (
+            /* Signup Form */
+            <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="businessName" className="block text-sm font-medium text-black mb-2">
                 Business Name *
@@ -270,7 +437,7 @@ export default function VendorSignup() {
             <div>
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || accountCreated}
                 className="group relative w-full flex justify-center py-3 px-4 sm:py-4 sm:px-6 border border-transparent text-base sm:text-lg font-medium rounded-xl text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300 hover-lift animate-glow disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -290,6 +457,7 @@ export default function VendorSignup() {
               </button>
             </div>
           </form>
+          )}
 
           <div className="mt-6 sm:mt-8">
             <div className="relative">

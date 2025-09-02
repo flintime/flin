@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${vendorData.id}/${imageType}/${Date.now()}.${fileExt}`
 
     // Upload to Supabase Storage using authenticated client
-    const { data: uploadData, error: uploadError } = await userSupabase.storage
+    const { error: uploadError } = await userSupabase.storage
       .from('vendor-images')
       .upload(fileName, file, {
         cacheControl: '3600',

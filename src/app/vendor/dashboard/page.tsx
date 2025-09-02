@@ -367,7 +367,7 @@ export default function VendorDashboard() {
         return;
       }
 
-      const offerData: any = {
+      const offerData = {
         ...offerFormData,
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString()

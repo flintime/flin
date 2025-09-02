@@ -43,6 +43,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if email is verified
+    if (!authData.user.email_confirmed_at) {
+      return NextResponse.json(
+        {
+          error: 'Please verify your email before logging in. Check your email for the verification code.',
+          needs_verification: true
+        },
+        { status: 403 }
+      )
+    }
+
     // Fetch vendor data - first try by user_id, then by email as fallback
     let vendorData, vendorError
     

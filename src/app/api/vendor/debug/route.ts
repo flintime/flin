@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Test specific addresses
-export async function POST(request: NextRequest) {
+export async function POST() {
   const testAddresses = [
     "1600 Amphitheatre Parkway, Mountain View, CA 94043",
     "Times Square, New York, NY",

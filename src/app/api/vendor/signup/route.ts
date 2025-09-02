@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 1: Create user account in Supabase Auth
+    // Step 1: Create user account in Supabase Auth with OTP verification
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
