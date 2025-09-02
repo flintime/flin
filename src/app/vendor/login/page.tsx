@@ -29,7 +29,6 @@ export default function VendorLogin() {
 
     setIsLoading(true);
     setMessage(null);
-    setLoginAttempted(true);
 
     try {
       const response = await fetch('/api/vendor/login', {
