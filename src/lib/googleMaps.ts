@@ -73,6 +73,19 @@ interface GooglePlacesDetailsResponse {
   error_message?: string;
 }
 
+interface GooglePlacesAutocompleteResponse {
+  status: string;
+  predictions: Array<{
+    place_id: string;
+    description: string;
+    structured_formatting: {
+      main_text: string;
+      secondary_text: string;
+    };
+  }>;
+  error_message?: string;
+}
+
 export class LocationIQError extends Error {
   constructor(
     message: string,
@@ -181,7 +194,7 @@ export async function getAddressAutocomplete(query: string, limit: number = 5): 
   try {
     const resp = await fetch(url, { method: 'GET' });
     if (!resp.ok) return [];
-    const data: GoogleMapsResponse = await resp.json();
+    const data: GooglePlacesAutocompleteResponse = await resp.json();
     if (data.status !== 'OK' || !Array.isArray(data.predictions)) return [];
     const items = data.predictions.slice(0, Math.min(limit, 10));
     // For autocomplete, we need to get place details for coordinates
