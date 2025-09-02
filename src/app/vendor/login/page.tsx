@@ -111,7 +111,6 @@ export default function VendorLogin() {
         // Reset OTP form and show login form
         setOtp('');
         setShowOtpInput(false);
-        setLoginAttempted(false);
       } else {
         setMessage({ type: 'error', text: data.error || 'OTP verification failed' });
       }
