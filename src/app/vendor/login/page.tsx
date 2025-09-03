@@ -342,9 +342,12 @@ export default function VendorLogin() {
                 </div>
 
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-black/70 hover:text-black transition-colors duration-300">
+                  <Link
+                    href="/vendor/forgot-password"
+                    className="font-medium text-black/70 hover:text-black transition-colors duration-300"
+                  >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
