@@ -3,32 +3,32 @@ import Link from 'next/link';
 export default function Features() {
   const features = [
     {
-      title: 'For Students',
+      title: 'Local Offers',
       description: 'Discover exclusive discounts and deals from local businesses near your campus. Save money on food, entertainment, and essentials.',
-      icon: '🎓',
-      href: '#download',
+      icon: '🏷️',
+      href: '/local-offers',
       benefits: ['Student-exclusive discounts', 'Local business partnerships', 'Real-time deal updates']
     },
     {
-      title: 'For Vendors',
-      description: 'Reach thousands of college students in your area. Create offers, manage your business profile, and grow your customer base.',
-      icon: '🏪',
-      href: '/vendor/signup',
-      benefits: ['Student-focused marketing', 'Easy offer management', 'Analytics dashboard']
+      title: 'Student Marketplace',
+      description: 'Buy and sell textbooks, electronics, furniture, and more with fellow students. Safe, secure, and convenient campus trading.',
+      icon: '🛒',
+      href: '/marketplace',
+      benefits: ['Textbooks & supplies', 'Electronics & gadgets', 'Furniture & housing items']
     },
     {
-      title: 'Safe & Secure',
-      description: 'Our platform ensures secure transactions and verified accounts for both students and vendors. Trust and safety first.',
-      icon: '🔒',
-      href: '#download',
-      benefits: ['Verified accounts', 'Secure payments', 'Community guidelines']
+      title: 'Housing',
+      description: 'Find the perfect place to live near campus. Search dorms, apartments, and shared housing with verified listings.',
+      icon: '🏠',
+      href: '/housing',
+      benefits: ['Verified listings', 'Campus proximity', 'Roommate matching']
     },
     {
-      title: 'Mobile First',
-      description: 'Access everything from your smartphone. Our mobile app is designed for the on-the-go college lifestyle.',
-      icon: '📱',
-      href: '#download',
-      benefits: ['Mobile-optimized', 'Push notifications', 'Offline access']
+      title: 'Events',
+      description: 'Stay connected with campus events, parties, study groups, and social gatherings. Never miss out on college life.',
+      icon: '🎉',
+      href: '/events',
+      benefits: ['Campus events', 'Social gatherings', 'Study group coordination']
     }
   ];
 
@@ -41,15 +41,15 @@ export default function Features() {
         {/* Section Header */}
         <div className="text-center mb-20">
           <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6 tracking-tight">
-            Built for Students
+            Everything You Need
             <span className="block relative">
-              & Vendors
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black/20 animate-pulse"></div>
+              For College Life
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black/20"></div>
             </span>
           </h2>
           <p className="text-xl text-black/70 max-w-3xl mx-auto leading-relaxed">
-            Connecting college students with local businesses through exclusive deals and seamless experiences. 
-            Everything you need in one platform.
+            Discover local deals, buy/sell with fellow students, find housing, and stay connected with campus events.
+            Your complete college companion in one app.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export default function Features() {
               
               <div className="relative p-8">
                 {/* Icon */}
-                <div className="flex items-center justify-center w-20 h-20 bg-black/5 border border-black/10 rounded-2xl mb-8 group-hover:bg-black/10 transition-all duration-300 animate-glow">
+                <div className="flex items-center justify-center w-20 h-20 bg-black/5 border border-black/10 rounded-2xl mb-8 group-hover:bg-black/10 transition-all duration-300">
                   <span className="text-4xl">{feature.icon}</span>
                 </div>
 
@@ -81,7 +81,7 @@ export default function Features() {
                 <ul className="space-y-3 mb-8">
                   {feature.benefits.map((benefit, benefitIndex) => (
                     <li key={benefitIndex} className="flex items-center text-black/70">
-                      <div className="w-2 h-2 bg-black rounded-full mr-4 animate-pulse"></div>
+                      <div className="w-2 h-2 bg-black rounded-full mr-4"></div>
                       {benefit}
                     </li>
                   ))}
@@ -97,12 +97,6 @@ export default function Features() {
                 </Link>
               </div>
 
-              {/* Coming Soon Badge */}
-              <div className="absolute top-6 right-6">
-                <span className="bg-black/10 border border-black/20 text-black text-xs font-medium px-4 py-2 rounded-full backdrop-blur-sm">
-                  Coming Soon
-                </span>
-              </div>
               
               {/* Geometric Accent */}
               <div className="absolute bottom-0 right-0 w-24 h-24 border-l border-t border-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

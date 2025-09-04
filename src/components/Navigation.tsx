@@ -22,9 +22,9 @@ export default function Navigation() {
               <Image
                 src="/Flinlogo.png"
                 alt="Flin Logo"
-                width={60}
-                height={60}
-                className="rounded-lg"
+                width={80}
+                height={80}
+                className=""
               />
             </Link>
           </div>

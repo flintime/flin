@@ -17,13 +17,13 @@ export default function Footer() {
               <Image
                 src="/Flinlogo.png"
                 alt="Flin Logo"
-                width={64}
-                height={64}
-                className="rounded-lg"
+                width={80}
+                height={80}
+                className=""
               />
             </div>
             <p className="text-white/70 text-sm mb-6 leading-relaxed">
-              The ultimate student platform connecting college students across America with exclusive vendor deals and experiences.
+              The ultimate student platform connecting college students across America with local offers, student marketplace, housing listings, and campus events.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
@@ -47,31 +47,31 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* For Vendors Column */}
+          {/* Student Resources Column */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white relative">
-              For Vendors
+              Student Resources
               <div className="absolute bottom-0 left-0 w-8 h-px bg-white/30 animate-pulse"></div>
             </h3>
             <ul className="space-y-4 text-sm">
               <li>
-                <Link href="/vendor/login" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Vendor Login
-                </Link>
-              </li>
-              <li>
-                <Link href="/vendor/signup" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Vendor Signup
-                </Link>
-              </li>
-              <li>
                 <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Business Solutions
+                  Campus Directory
                 </a>
               </li>
               <li>
                 <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Advertising
+                  Study Groups
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Event Calendar
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Student Blog
                 </a>
               </li>
             </ul>

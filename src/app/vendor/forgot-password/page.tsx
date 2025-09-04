@@ -80,9 +80,9 @@ export default function VendorForgotPassword() {
             <Image
               src="/Flinlogo.png"
               alt="Flin Logo"
-              width={64}
-              height={64}
-              className="sm:w-20 sm:h-20 rounded-xl"
+              width={80}
+              height={80}
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl"
             />
           </Link>
         </div>

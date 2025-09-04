@@ -190,9 +190,8 @@ export default function VendorSignup() {
             <Image
               src="/Flinlogo.png"
               alt="Flin Logo"
-              width={64}
-              height={64}
-              className="sm:w-20 sm:h-20 rounded-xl"
+              width={96}
+              height={96}
             />
           </Link>
         </div>

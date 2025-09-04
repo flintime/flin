@@ -25,17 +25,17 @@ export default function Hero() {
               </span>
             </h1>
             <p className="text-xl sm:text-2xl text-black/70 mb-10 max-w-2xl leading-relaxed">
-              Connecting college students with exclusive vendor deals and experiences across the USA. 
-              Save money, discover local businesses, and enhance your college life! 🇺🇸
+              Empowering college students across America with exclusive deals, local offers, housing, and campus events.
+              Save money and discover everything your campus has to offer! 🇺🇸
             </p>
             
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-10">
               <span className="bg-black/5 border border-black/20 text-black px-6 py-3 rounded-full text-sm font-medium hover-lift animate-pulse-border">
-                🎓 For Students
+                🎓 Student Focused
               </span>
               <span className="bg-black/5 border border-black/20 text-black px-6 py-3 rounded-full text-sm font-medium hover-lift animate-pulse-border">
-                🏪 For Vendors
+                💰 Save Money
               </span>
               <span className="bg-black/5 border border-black/20 text-black px-6 py-3 rounded-full text-sm font-medium hover-lift animate-pulse-border">
                 🔒 Safe & Secure

@@ -697,9 +697,9 @@ export default function VendorDashboard() {
               <Image
                 src="/Flinlogo.png"
                 alt="Flin"
-                width={64}
-                height={64}
-                className="mr-3"
+                width={80}
+                height={80}
+                className="w-12 h-12 sm:w-16 sm:h-16 mr-3 rounded-xl"
               />
             </div>
             
