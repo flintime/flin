@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default function VendorLogin() {
   const [formData, setFormData] = useState({
@@ -163,7 +164,13 @@ export default function VendorLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center py-6 px-4 sm:py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <>
+      <Head>
+        <title>Vendor Login - Flin</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="googlebot" content="noindex, nofollow" />
+      </Head>
+      <div className="min-h-screen bg-white flex flex-col justify-center py-6 px-4 sm:py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 grid-pattern opacity-20"></div>
       
@@ -413,5 +420,6 @@ export default function VendorLogin() {
         </div>
       </div>
     </div>
+    </>
   );
 }
