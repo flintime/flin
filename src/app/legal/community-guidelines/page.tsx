@@ -250,7 +250,7 @@ export default function CommunityGuidelines() {
             <p className="text-black/70 mb-4">Help keep Flin safe by reporting guideline violations:</p>
             <ul className="list-disc pl-6 text-black/70 mb-4 space-y-2">
               <li><strong>In-app reporting:</strong> Use the report button on posts, messages, or profiles</li>
-              <li><strong>Email support:</strong> Contact <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a> with "Community Guidelines Violation" in the subject</li>
+              <li><strong>Email support:</strong> Contact <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a> with "Community Guidelines Violation" in the subject</li>
               <li><strong>Emergency situations:</strong> Contact local authorities first, then notify Flin</li>
               <li><strong>Provide details:</strong> Include screenshots, timestamps, and description of the violation</li>
             </ul>
@@ -277,7 +277,7 @@ export default function CommunityGuidelines() {
 
             <h3 className="text-xl font-semibold text-black mb-3">8.4 Appeal Process</h3>
             <p className="text-black/70 mb-4">
-              If you believe enforcement action was taken in error, you can appeal by contacting <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a> with "Appeal" in the subject line. Include your account information and explanation of why you believe the action was incorrect.
+              If you believe enforcement action was taken in error, you can appeal by contacting <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a> with "Appeal" in the subject line. Include your account information and explanation of why you believe the action was incorrect.
             </p>
           </section>
 
@@ -301,7 +301,7 @@ export default function CommunityGuidelines() {
 
             <h3 className="text-xl font-semibold text-black mb-3">9.3 Feedback and Suggestions</h3>
             <p className="text-black/70 mb-4">
-              Your input helps us improve Flin. Share suggestions for new features, policy improvements, or community initiatives at <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a> with "Community Feedback" in the subject.
+              Your input helps us improve Flin. Share suggestions for new features, policy improvements, or community initiatives at <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a> with "Community Feedback" in the subject.
             </p>
           </section>
 
@@ -330,7 +330,7 @@ export default function CommunityGuidelines() {
               <p className="text-black/70 mb-2"><strong>Flintime Inc. Community Support</strong></p>
               <p className="text-black/70 mb-2">254 Chapman Rd, Ste 208 #20381</p>
               <p className="text-black/70 mb-2">Newark, Delaware 19702, US</p>
-              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a></p>
+              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a></p>
               <p className="text-black/70 mb-2">Subject Line Options:</p>
               <ul className="list-disc pl-6 text-black/70 text-sm space-y-1">
                 <li>"Community Guidelines Question"</li>

@@ -380,7 +380,7 @@ export default function Accessibility() {
             <div className="bg-blue-50 rounded-lg p-6 mb-4">
               <h4 className="font-semibold text-blue-900 mb-3">📞 Contact Information</h4>
               <ul className="text-blue-800 text-sm space-y-2">
-                <li><strong>Email:</strong> <a href="mailto:accessibility@flintime.com" className="underline">accessibility@flintime.com</a></li>
+                <li><strong>Email:</strong> <a href="mailto:accessibility@flin.college" className="underline">accessibility@flin.college</a></li>
                 <li><strong>Phone:</strong> 1-800-FLIN-ACCESS (1-800-354-6222)</li>
                 <li><strong>Text/SMS:</strong> Available upon request</li>
                 <li><strong>Video relay:</strong> VRS-compatible phone support</li>
@@ -420,7 +420,7 @@ export default function Accessibility() {
             <div className="bg-green-50 rounded-lg p-6 mb-4">
               <h4 className="font-semibold text-green-900 mb-3">📝 Reporting Process</h4>
               <ol className="list-decimal pl-6 text-green-800 text-sm space-y-2">
-                <li>Email us at <a href="mailto:accessibility@flintime.com" className="underline">accessibility@flintime.com</a></li>
+                <li>Email us at <a href="mailto:accessibility@flin.college" className="underline">accessibility@flin.college</a></li>
                 <li>Include "Accessibility Issue" in the subject line</li>
                 <li>Describe the problem you encountered</li>
                 <li>Tell us what you were trying to accomplish</li>
@@ -537,9 +537,9 @@ export default function Accessibility() {
               <p className="text-black/70 mb-2"><strong>Flintime Inc. Accessibility Team</strong></p>
               <p className="text-black/70 mb-2">254 Chapman Rd, Ste 208 #20381</p>
               <p className="text-black/70 mb-2">Newark, Delaware 19702, US</p>
-              <p className="text-black/70 mb-2">Email: <a href="mailto:accessibility@flintime.com" className="text-blue-600 hover:text-blue-500">accessibility@flintime.com</a></p>
+              <p className="text-black/70 mb-2">Email: <a href="mailto:accessibility@flin.college" className="text-blue-600 hover:text-blue-500">accessibility@flin.college</a></p>
               <p className="text-black/70 mb-2">Phone: 1-800-FLIN-ACCESS (1-800-354-6222)</p>
-              <p className="text-black/70 mb-2">General Contact: <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a></p>
+              <p className="text-black/70 mb-2">General Contact: <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a></p>
               <p className="text-black/70 mb-2">Subject Line Options:</p>
               <ul className="list-disc pl-6 text-black/70 text-sm space-y-1">
                 <li>"Accessibility Issue"</li>

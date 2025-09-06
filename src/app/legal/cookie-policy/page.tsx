@@ -442,7 +442,7 @@ export default function CookiePolicy() {
               <p className="text-black/70 mb-2"><strong>Flintime Inc. Privacy Team</strong></p>
               <p className="text-black/70 mb-2">254 Chapman Rd, Ste 208 #20381</p>
               <p className="text-black/70 mb-2">Newark, Delaware 19702, US</p>
-              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a></p>
+              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a></p>
               <p className="text-black/70 mb-2">Subject Line Options:</p>
               <ul className="list-disc pl-6 text-black/70 text-sm space-y-1">
                 <li>"Cookie Policy Question"</li>

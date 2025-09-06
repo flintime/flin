@@ -488,7 +488,7 @@ export default function TermsOfService() {
             
             <h3 className="text-xl font-semibold text-black mb-3">11.1 Informal Resolution</h3>
             <p className="text-black/70 mb-4">
-              Before filing any formal dispute, you agree to contact us at <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a> to resolve the issue informally. We will work in good faith to resolve disputes within 30 days.
+              Before filing any formal dispute, you agree to contact us at <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a> to resolve the issue informally. We will work in good faith to resolve disputes within 30 days.
             </p>
 
             <h3 className="text-xl font-semibold text-black mb-3">11.2 Binding Arbitration</h3>
@@ -605,7 +605,7 @@ export default function TermsOfService() {
               <p className="text-black/70 mb-2"><strong>Flintime Inc.</strong></p>
               <p className="text-black/70 mb-2">254 Chapman Rd, Ste 208 #20381</p>
               <p className="text-black/70 mb-2">Newark, Delaware 19702, US</p>
-              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a></p>
+              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a></p>
               <p className="text-black/70">Subject Line: "Terms of Service Inquiry"</p>
             </div>
             <p className="text-black/70">

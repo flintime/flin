@@ -55,7 +55,7 @@ export default function SafetyGuidelines() {
             </div>
           </div>
           <p className="text-red-800 mt-3 text-sm">
-            After ensuring your safety, please report the incident to Flin at <a href="mailto:contact@flintime.com" className="underline">contact@flintime.com</a> with "URGENT SAFETY ISSUE" in the subject line.
+            After ensuring your safety, please report the incident to Flin at <a href="mailto:contact@flin.college" className="underline">contact@flin.college</a> with "URGENT SAFETY ISSUE" in the subject line.
           </p>
         </div>
 
@@ -390,7 +390,7 @@ export default function SafetyGuidelines() {
                 <ul className="text-green-800 text-sm space-y-1">
                   <li>Use in-app report buttons</li>
                   <li>Screenshot evidence if possible</li>
-                  <li>Email contact@flintime.com</li>
+                  <li>Email contact@flin.college</li>
                   <li>Include "SAFETY ISSUE" in subject</li>
                 </ul>
               </div>
@@ -430,7 +430,7 @@ export default function SafetyGuidelines() {
                 <div>
                   <p className="font-semibold text-gray-800">Trusted Friend/Family: [Personal contact]</p>
                   <p className="font-semibold text-gray-800">Academic Advisor: [Your advisor]</p>
-                  <p className="font-semibold text-gray-800">Flin Support: contact@flintime.com</p>
+                  <p className="font-semibold text-gray-800">Flin Support: contact@flin.college</p>
                 </div>
               </div>
             </div>
@@ -497,7 +497,7 @@ export default function SafetyGuidelines() {
               <p className="text-black/70 mb-2"><strong>Flintime Inc. Safety Team</strong></p>
               <p className="text-black/70 mb-2">254 Chapman Rd, Ste 208 #20381</p>
               <p className="text-black/70 mb-2">Newark, Delaware 19702, US</p>
-              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a></p>
+              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a></p>
               <p className="text-black/70 mb-2">For safety issues, use these subject lines:</p>
               <ul className="list-disc pl-6 text-black/70 text-sm space-y-1">
                 <li>"URGENT SAFETY ISSUE" - for immediate concerns</li>

@@ -237,7 +237,7 @@ export default function PrivacyPolicy() {
             </ul>
 
             <p className="text-black/70 mb-4">
-              To exercise these rights, contact us at <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a>. We will respond within 30 days of receiving your request.
+              To exercise these rights, contact us at <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a>. We will respond within 30 days of receiving your request.
             </p>
           </section>
 
@@ -273,7 +273,7 @@ export default function PrivacyPolicy() {
               Flin is not intended for use by individuals under 17 years of age. We do not knowingly collect personal information from children under 17. If we become aware that we have collected personal information from a child under 17, we will take steps to delete such information promptly.
             </p>
             <p className="text-black/70 mb-4">
-              If you are a parent or guardian and believe your child under 17 has provided us with personal information, please contact us at <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a>.
+              If you are a parent or guardian and believe your child under 17 has provided us with personal information, please contact us at <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a>.
             </p>
           </section>
 
@@ -413,7 +413,7 @@ export default function PrivacyPolicy() {
               <p className="text-black/70 mb-2"><strong>Flintime Inc.</strong></p>
               <p className="text-black/70 mb-2">254 Chapman Rd, Ste 208 #20381</p>
               <p className="text-black/70 mb-2">Newark, Delaware 19702, US</p>
-              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flintime.com" className="text-blue-600 hover:text-blue-500">contact@flintime.com</a></p>
+              <p className="text-black/70 mb-2">Email: <a href="mailto:contact@flin.college" className="text-blue-600 hover:text-blue-500">contact@flin.college</a></p>
               <p className="text-black/70">Subject Line: "Privacy Policy Inquiry"</p>
             </div>
             <p className="text-black/70">
