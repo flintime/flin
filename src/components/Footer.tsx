@@ -6,8 +6,6 @@ export default function Footer() {
 
   return (
     <footer className="bg-black text-white relative overflow-hidden">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-10"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -26,53 +24,63 @@ export default function Footer() {
               The ultimate student platform connecting college students across America with local offers, student marketplace, housing listings, and campus events.
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
-                <span className="sr-only">Facebook</span>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
+              <a href="https://www.instagram.com/flin.college/" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
                 <span className="sr-only">Instagram</span>
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987c6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323C6.001 8.198 7.152 7.708 8.449 7.708s2.448.49 3.323 1.418c.925.875 1.418 2.026 1.418 3.323s-.493 2.448-1.418 3.323c-.875.925-2.026 1.418-3.323 1.418zm7.138 0c-1.297 0-2.448-.49-3.323-1.297-.925-.875-1.418-2.026-1.418-3.323s.493-2.448 1.418-3.323c.875-.925 2.026-1.418 3.323-1.418s2.448.49 3.323 1.418c.925.875 1.418 2.026 1.418 3.323s-.493 2.448-1.418 3.323c-.875.925-2.026 1.418-3.323 1.418z"/>
+                  <path d="M12.2.3c3.4 0 3.8 0 5.1.1 1.2.1 2.1.2 2.8.5.8.3 1.4.7 2 1.3.6.6 1 1.2 1.3 2 .3.7.4 1.6.5 2.8.1 1.3.1 1.7.1 5.1s0 3.8-.1 5.1c-.1 1.2-.2 2.1-.5 2.8-.3.8-.7 1.4-1.3 2-.6.6-1.2 1-2 1.3-.7.3-1.6.4-2.8.5-1.3.1-1.7.1-5.1.1s-3.8 0-5.1-.1c-1.2-.1-2.1-.2-2.8-.5-.8-.3-1.4-.7-2-1.3-.6-.6-1-1.2-1.3-2-.3-.7-.4-1.6-.5-2.8-.1-1.3-.1-1.7-.1-5.1s0-3.8.1-5.1c.1-1.2.2-2.1.5-2.8.3-.8.7-1.4 1.3-2 .6-.6 1.2-1 2-1.3.7-.3 1.6-.4 2.8-.5 1.3-.1 1.7-.1 5.1-.1zm0 2.2c-3.3 0-3.7 0-5 .1-1.1 0-1.7.2-2.1.3-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.1.4-.3 1-.3 2.1-.1 1.3-.1 1.6-.1 5s0 3.7.1 5c0 1.1.2 1.7.3 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.1 1 .3 2.1.3 1.3.1 1.6.1 5 .1s3.7 0 5-.1c1.1 0 1.7-.2 2.1-.3.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.1-.4.3-1 .3-2.1.1-1.3.1-1.6.1-5s0-3.7-.1-5c0-1.1-.2-1.7-.3-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.1-1-.3-2.1-.3-1.3-.1-1.6-.1-5-.1zm0 3.8c3.6 0 6.5 2.9 6.5 6.5s-2.9 6.5-6.5 6.5-6.5-2.9-6.5-6.5 2.9-6.5 6.5-6.5zm0 10.7c2.3 0 4.2-1.9 4.2-4.2s-1.9-4.2-4.2-4.2-4.2 1.9-4.2 4.2 1.9 4.2 4.2 4.2zm8.2-11c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5z"/>
                 </svg>
               </a>
-              <a href="#" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
-                <span className="sr-only">Twitter</span>
+              <a href="https://x.com/flincollege" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
+                <span className="sr-only">X (Twitter)</span>
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a href="https://www.linkedin.com/company/flincollege" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
+                <span className="sr-only">LinkedIn</span>
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                 </svg>
               </a>
             </div>
           </div>
 
-          {/* Student Resources Column */}
+          {/* Legal Column */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white relative">
-              Student Resources
+              Legal
               <div className="absolute bottom-0 left-0 w-8 h-px bg-white/30 animate-pulse"></div>
             </h3>
             <ul className="space-y-4 text-sm">
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Campus Directory
-                </a>
+                <Link href="/legal/terms-of-service" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Terms of Service
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Study Groups
-                </a>
+                <Link href="/legal/privacy-policy" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Event Calendar
-                </a>
+                <Link href="/legal/cookie-policy" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Cookie Policy
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Student Blog
-                </a>
+                <Link href="/legal/safety-guidelines" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Safety Guidelines
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/community-guidelines" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Community Guidelines
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/accessibility" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  Accessibility
+                </Link>
               </li>
             </ul>
           </div>
@@ -85,19 +93,14 @@ export default function Footer() {
             </h3>
             <ul className="space-y-4 text-sm">
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Help Center
+                <a href="mailto:contact@flin.college" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  contact@flin.college
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Contact Us
+                <a href="tel:+19165980203" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
+                  +1 (916) 598-0203
                 </a>
-              </li>
-              <li>
-                <Link href="/legal" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                  Legal & Policies
-                </Link>
               </li>
             </ul>
           </div>
@@ -121,9 +124,7 @@ export default function Footer() {
           </div>
         </div>
         
-        {/* Decorative Elements */}
-        <div className="absolute top-8 right-8 w-4 h-4 border border-white/20 rotate-45 animate-pulse"></div>
-        <div className="absolute bottom-8 left-8 w-6 h-6 border border-white/20 rounded-full animate-pulse"></div>
+        
       </div>
     </footer>
   );

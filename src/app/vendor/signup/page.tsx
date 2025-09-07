@@ -105,10 +105,9 @@ export default function VendorSignup() {
       const data = await response.json();
 
       if (response.ok) {
-        const pin = data.data?.vendor?.vendor_pin;
         setMessage({
           type: 'success',
-          text: `Email verified successfully! Your unique vendor PIN is: ${pin}. Please save this PIN - you'll need it for business operations. You can now log in to your dashboard.`
+          text: 'Email verified successfully! You can now log in to your dashboard.'
         });
 
         // Reset form
@@ -183,14 +182,6 @@ export default function VendorSignup() {
         <meta name="googlebot" content="noindex, nofollow" />
       </Head>
       <div className="min-h-screen bg-white flex flex-col justify-center py-6 px-4 sm:py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-20"></div>
-      
-      {/* Floating Geometric Elements - Hidden on mobile for cleaner look */}
-      <div className="hidden sm:block absolute top-20 left-10 w-16 h-16 border border-black/20 rounded-lg animate-float"></div>
-      <div className="hidden sm:block absolute top-40 right-20 w-8 h-8 border border-black/30 rotate-45 animate-float-delay"></div>
-      <div className="hidden sm:block absolute bottom-40 left-20 w-12 h-12 border border-black/20 rounded-full animate-float"></div>
-      <div className="hidden sm:block absolute bottom-20 right-10 w-4 h-4 bg-black animate-float-delay"></div>
       <div className="mx-auto w-full max-w-md relative z-10">
         <div className="flex justify-center mb-6 sm:mb-8">
           <Link href="/">

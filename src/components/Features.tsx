@@ -4,38 +4,33 @@ export default function Features() {
   const features = [
     {
       title: 'Local Offers',
-      description: 'Discover exclusive discounts and deals from local businesses near your campus. Save money on food, entertainment, and essentials.',
+      description: 'Unlock exclusive student discounts at restaurants, shops, and services near your campus. Save up to 50% on everything you need.',
       icon: '🏷️',
-      href: '/local-offers',
-      benefits: ['Student-exclusive discounts', 'Local business partnerships', 'Real-time deal updates']
+      benefits: ['Up to 50% off local businesses', 'Student ID verification', 'New deals added weekly']
     },
     {
       title: 'Student Marketplace',
-      description: 'Buy and sell textbooks, electronics, furniture, and more with fellow students. Safe, secure, and convenient campus trading.',
+      description: 'Buy and sell textbooks, electronics, and dorm essentials with verified students. Safe transactions, great prices.',
       icon: '🛒',
-      href: '/marketplace',
-      benefits: ['Textbooks & supplies', 'Electronics & gadgets', 'Furniture & housing items']
+      benefits: ['Verified student sellers', 'Secure payment system', 'Campus pickup available']
     },
     {
       title: 'Housing',
-      description: 'Find the perfect place to live near campus. Search dorms, apartments, and shared housing with verified listings.',
+      description: 'Discover the perfect place to call home. From dorms to apartments, find housing that fits your budget and lifestyle.',
       icon: '🏠',
-      href: '/housing',
-      benefits: ['Verified listings', 'Campus proximity', 'Roommate matching']
+      benefits: ['Verified landlords', 'Virtual tours available', 'Roommate matching']
     },
     {
       title: 'Events',
-      description: 'Stay connected with campus events, parties, study groups, and social gatherings. Never miss out on college life.',
+      description: 'Never miss out on campus life. Discover parties, study groups, career fairs, and social events happening around you.',
       icon: '🎉',
-      href: '/events',
-      benefits: ['Campus events', 'Social gatherings', 'Study group coordination']
+      benefits: ['Real-time event updates', 'RSVP and reminders', 'Connect with attendees']
     }
   ];
 
   return (
     <section id="features" className="py-24 bg-white relative overflow-hidden">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-20"></div>
+      
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
@@ -55,51 +50,43 @@ export default function Features() {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {features.map((feature) => (
+          {features.map((feature, index) => (
             <div
               key={feature.title}
-              className="group relative bg-white/80 backdrop-blur-sm rounded-2xl border border-black/10 hover-lift glass-effect overflow-hidden"
+              className="group relative bg-white rounded-3xl border border-black/10 hover-lift shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
             >
-              {/* Animated Border */}
-              <div className="absolute inset-0 border-2 border-transparent bg-gradient-to-r from-black/5 via-transparent to-black/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              {/* Orange Gradient Background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-orange-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
               <div className="relative p-8">
                 {/* Icon */}
-                <div className="flex items-center justify-center w-20 h-20 bg-black/5 border border-black/10 rounded-2xl mb-8 group-hover:bg-black/10 transition-all duration-300">
-                  <span className="text-4xl">{feature.icon}</span>
+                <div className="mb-8">
+                  <div className="flex items-center justify-center w-24 h-24 bg-white border-2 border-orange-500/20 rounded-3xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-5xl">{feature.icon}</span>
+                  </div>
                 </div>
 
                 {/* Content */}
-                <h3 className="text-2xl font-bold text-black mb-4 group-hover:text-black transition-colors duration-300">
+                <h3 className="text-3xl font-bold text-black mb-4 group-hover:text-orange-600 transition-colors duration-300">
                   {feature.title}
                 </h3>
                 <p className="text-black/70 mb-8 leading-relaxed text-lg">
                   {feature.description}
                 </p>
 
-                {/* Benefits */}
-                <ul className="space-y-3 mb-8">
+                {/* Benefits with orange styling */}
+                <div className="space-y-4">
                   {feature.benefits.map((benefit, benefitIndex) => (
-                    <li key={benefitIndex} className="flex items-center text-black/70">
-                      <div className="w-2 h-2 bg-black rounded-full mr-4"></div>
-                      {benefit}
-                    </li>
+                    <div key={benefitIndex} className="flex items-center text-black/70 group-hover:text-black transition-colors duration-300">
+                      <div className="w-3 h-3 bg-orange-500 rounded-full mr-4 opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <span className="font-medium">{benefit}</span>
+                    </div>
                   ))}
-                </ul>
-
-                {/* CTA Button */}
-                <Link
-                  href={feature.href}
-                  className="inline-flex items-center text-black font-semibold hover:text-black/80 transition-all duration-300 group-hover:translate-x-2"
-                >
-                  Explore {feature.title}
-                  <span className="ml-3 text-xl transition-transform duration-300 group-hover:translate-x-1">→</span>
-                </Link>
+                </div>
               </div>
 
-              
-              {/* Geometric Accent */}
-              <div className="absolute bottom-0 right-0 w-24 h-24 border-l border-t border-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              {/* Orange corner accent */}
+              <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-tl-3xl"></div>
             </div>
           ))}
         </div>
@@ -107,8 +94,7 @@ export default function Features() {
         {/* Bottom CTA */}
         <div className="text-center mt-20">
           <div className="relative bg-black/5 backdrop-blur-sm border border-black/10 rounded-3xl p-12 glass-effect overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 grid-pattern opacity-10"></div>
+            
             
             <div className="relative z-10">
               <h3 className="text-3xl font-bold text-black mb-6">
@@ -125,9 +111,7 @@ export default function Features() {
               </Link>
             </div>
             
-            {/* Decorative Elements */}
-            <div className="absolute top-4 left-4 w-8 h-8 border border-black/20 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-4 right-4 w-6 h-6 bg-black/20 rotate-45 animate-pulse"></div>
+            
           </div>
         </div>
       </div>

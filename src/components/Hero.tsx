@@ -4,19 +4,12 @@ import Link from 'next/link';
 export default function Hero() {
   return (
     <div className="relative min-h-screen flex items-center bg-white overflow-hidden">
-      {/* Futuristic Grid Background */}
-      <div className="absolute inset-0 grid-pattern opacity-30"></div>
       
-      {/* Floating Geometric Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 border border-black/20 rounded-lg animate-float"></div>
-      <div className="absolute top-40 right-20 w-12 h-12 border border-black/30 rotate-45 animate-float-delay"></div>
-      <div className="absolute bottom-40 left-20 w-16 h-16 border border-black/20 rounded-full animate-float"></div>
-      <div className="absolute bottom-20 right-10 w-8 h-8 bg-black animate-float-delay"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left Column - Text Content */}
-          <div className="text-center lg:text-left">
+          {/* Text Content - First on desktop, Second on mobile */}
+          <div className="text-center lg:text-left order-2 lg:order-1">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-black mb-8 tracking-tight">
               The Ultimate
               <span className="block relative">
@@ -78,11 +71,9 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Column - Mascot */}
-          <div className="flex justify-center lg:justify-end">
+          {/* Mascot - First on mobile, Second on desktop */}
+          <div className="flex justify-center lg:justify-end order-1 lg:order-2">
             <div className="relative">
-              {/* Futuristic Glow Effect */}
-              <div className="absolute inset-0 bg-black/5 rounded-full blur-3xl scale-110 animate-pulse"></div>
               
               <Image
                 src="/flin.png"
@@ -92,8 +83,7 @@ export default function Hero() {
                 className="relative z-10 filter drop-shadow-2xl animate-float"
                 priority
               />
-              
-              {/* Floating Geometric Elements */}
+              {/* Icon Badges around mascot */}
               <div className="absolute top-10 -left-8 bg-white border-2 border-black/20 p-4 rounded-xl shadow-2xl transform rotate-12 animate-float hover-lift">
                 <span className="text-3xl">🎓</span>
               </div>
@@ -103,11 +93,10 @@ export default function Hero() {
               <div className="absolute bottom-20 -left-12 bg-white border-2 border-black/20 p-4 rounded-xl shadow-2xl transform rotate-6 animate-float hover-lift">
                 <span className="text-3xl">💰</span>
               </div>
+              <div className="absolute bottom-20 -right-12 bg-white border-2 border-black/20 p-4 rounded-xl shadow-2xl transform -rotate-6 animate-float-delay hover-lift">
+                <span className="text-3xl">🏠</span>
+              </div>
               
-              {/* Geometric Accent Lines */}
-              <div className="absolute top-0 left-1/2 w-px h-20 bg-black/20 animate-pulse"></div>
-              <div className="absolute bottom-0 right-1/4 w-px h-16 bg-black/20 animate-pulse"></div>
-              <div className="absolute left-0 top-1/2 w-16 h-px bg-black/20 animate-pulse"></div>
             </div>
           </div>
         </div>

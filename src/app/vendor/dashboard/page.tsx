@@ -696,10 +696,10 @@ export default function VendorDashboard() {
             <div className="flex items-center">
               <Image
                 src="/Flinlogo.png"
-                alt="Flin"
+                alt="Flin Logo"
                 width={80}
                 height={80}
-                className="w-12 h-12 sm:w-16 sm:h-16 mr-3 rounded-xl"
+                className="mr-3"
               />
             </div>
             
@@ -778,17 +778,6 @@ export default function VendorDashboard() {
             {message.text}
           </div>
         )}
-
-        {/* Vendor PIN Display */}
-        <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-8 mb-6 sm:mb-8 text-center">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">Your Vendor PIN</h2>
-          <div className="text-4xl sm:text-6xl font-bold text-black tracking-wider mb-4">
-            {vendor.vendor_pin || '------'}
-          </div>
-          <p className="text-sm sm:text-base text-gray-600">
-            Use this PIN for business operations and transactions
-          </p>
-        </div>
 
         {/* Offers Management */}
         <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6 sm:mb-8">

@@ -108,14 +108,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-20"></div>
-
-      {/* Floating Geometric Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 border border-black/20 rounded-lg animate-float"></div>
-      <div className="absolute top-40 right-20 w-12 h-12 border border-black/30 rotate-45 animate-float-delay"></div>
-      <div className="absolute bottom-40 left-20 w-16 h-16 border border-black/20 rounded-full animate-float"></div>
-      <div className="absolute bottom-20 right-10 w-8 h-8 bg-black animate-float-delay"></div>
+      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header with Flin Logo */}

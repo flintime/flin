@@ -114,14 +114,6 @@ export default function VendorResetPassword() {
         <meta name="googlebot" content="noindex, nofollow" />
       </Head>
       <div className="min-h-screen bg-white flex flex-col justify-center py-6 px-4 sm:py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-20"></div>
-
-      {/* Floating Geometric Elements - Hidden on mobile for cleaner look */}
-      <div className="hidden sm:block absolute top-20 left-10 w-16 h-16 border border-black/20 rounded-lg animate-float"></div>
-      <div className="hidden sm:block absolute top-40 right-20 w-8 h-8 border border-black/30 rotate-45 animate-float-delay"></div>
-      <div className="hidden sm:block absolute bottom-40 left-20 w-12 h-12 border border-black/20 rounded-full animate-float"></div>
-      <div className="hidden sm:block absolute bottom-20 right-10 w-4 h-4 bg-black animate-float-delay"></div>
 
       <div className="mx-auto w-full max-w-md relative z-10">
         <div className="flex justify-center mb-6 sm:mb-8">
