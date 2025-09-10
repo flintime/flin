@@ -41,7 +41,9 @@ export default function Hero() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mb-12">
               <Link
-                href="#download"
+                href="https://apps.apple.com/app/flin-college/id6751548665"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-black text-white px-10 py-5 rounded-xl text-lg font-semibold hover:bg-black/80 transition-all duration-300 hover-lift animate-glow"
               >
                 📱 Download iOS App
