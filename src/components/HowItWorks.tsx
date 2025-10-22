@@ -41,7 +41,7 @@ export default function HowItWorks() {
             Your Campus Life, <span className="text-[#fb541c]">Simplified</span>
           </h2>
           <p className="text-xl text-black/70 max-w-3xl mx-auto leading-relaxed">
-            Four simple steps to save money, connect with students, find housing, and discover events.
+            Your one-stop app for student discounts, deals, marketplace and campus events
           </p>
         </div>
 

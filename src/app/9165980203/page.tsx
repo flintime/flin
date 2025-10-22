@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
+import StatCard from '@/components/admin/StatCard'
 
 interface UserStats {
   totalUsers: number
@@ -108,128 +108,28 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        {/* Header with Flin Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center">
-            <Image
-              src="/flin.png"
-              alt="Flin Logo"
-              width={200}
-              height={200}
-              className="drop-shadow-lg"
-              priority
-            />
-          </div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-600 mt-1">Key metrics for platform performance</p>
         </div>
 
         {/* Main Metrics - Users & Vendors */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Total Users Card */}
-          <div className="group relative">
-            <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-black/10 hover-lift glass-effect overflow-hidden p-10 shadow-xl">
-              {/* Animated Border */}
-              <div className="absolute inset-0 border-2 border-transparent bg-gradient-to-r from-black/5 via-transparent to-black/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-              <div className="relative">
-                {/* Icon */}
-                <div className="flex items-center justify-between mb-10">
-                  <div className="w-20 h-20 bg-black/5 border border-black/10 rounded-3xl flex items-center justify-center shadow-2xl">
-                    <span className="text-4xl">👥</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-black/60 font-medium">Total Users</div>
-                  </div>
-                </div>
-
-                {/* Big Number */}
-                <div className="mb-8">
-                  {stats.loading ? (
-                    <div className="animate-pulse">
-                      <div className="h-24 bg-black/10 rounded-xl w-64"></div>
-                    </div>
-                  ) : stats.error ? (
-                    <div className="text-red-600 text-3xl font-medium">
-                      Error loading data
-                    </div>
-                  ) : (
-                    <div className="text-8xl lg:text-9xl font-black text-black mb-4">
-                      {stats.totalUsers.toLocaleString()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Description */}
-                <p className="text-black/70 text-xl leading-relaxed font-medium">
-                  Registered users on your platform
-                </p>
-
-                {/* Progress bar */}
-                <div className="mt-10">
-                  <div className="h-3 bg-black/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-black to-black/60 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Geometric Accent */}
-              <div className="absolute bottom-6 right-6 w-32 h-32 border border-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-            </div>
-          </div>
-
-          {/* Total Vendors Card */}
-          <div className="group relative">
-            <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-black/10 hover-lift glass-effect overflow-hidden p-10 shadow-xl">
-              {/* Animated Border */}
-              <div className="absolute inset-0 border-2 border-transparent bg-gradient-to-r from-black/5 via-transparent to-black/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-              <div className="relative">
-                {/* Icon */}
-                <div className="flex items-center justify-between mb-10">
-                  <div className="w-20 h-20 bg-black/5 border border-black/10 rounded-3xl flex items-center justify-center shadow-2xl">
-                    <span className="text-4xl">🏪</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-black/60 font-medium">Total Vendors</div>
-                  </div>
-                </div>
-
-                {/* Big Number */}
-                <div className="mb-8">
-                  {stats.loading ? (
-                    <div className="animate-pulse">
-                      <div className="h-24 bg-black/10 rounded-xl w-64"></div>
-                    </div>
-                  ) : stats.error ? (
-                    <div className="text-red-600 text-3xl font-medium">
-                      Error loading data
-                    </div>
-                  ) : (
-                    <div className="text-8xl lg:text-9xl font-black text-black mb-4">
-                      {stats.totalVendors.toLocaleString()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Description */}
-                <p className="text-black/70 text-xl leading-relaxed font-medium">
-                  Registered vendors on your platform
-                </p>
-
-                {/* Progress bar */}
-                <div className="mt-10">
-                  <div className="h-3 bg-black/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-black to-black/60 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Geometric Accent */}
-              <div className="absolute bottom-6 right-6 w-32 h-32 border border-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-            </div>
-          </div>
+          <StatCard
+            title="Total Users"
+            icon="👥"
+            value={stats.totalUsers}
+            loading={stats.loading}
+            error={stats.error}
+          />
+          <StatCard
+            title="Total Vendors"
+            icon="🏪"
+            value={stats.totalVendors}
+            loading={stats.loading}
+            error={stats.error}
+          />
         </div>
 
         {/* Activity Metrics */}
@@ -332,73 +232,45 @@ export default function AdminDashboard() {
 
         {/* College Distribution Section */}
         <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-black/10 glass-effect overflow-hidden p-8 mb-16">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-3xl font-bold text-black">🎓 Users by College</h3>
-            <div className="text-sm text-black/60">
-              Top 10 universities
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-semibold text-gray-900">Users by College</h3>
+            <div className="text-xs text-gray-600">Top 10 universities</div>
+          </div>
+          {stats.loading ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-10 bg-gray-100 rounded animate-pulse"></div>
+              ))}
             </div>
-          </div>
-
-          <div className="space-y-4">
-            {stats.loading ? (
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="h-12 bg-black/10 rounded-xl"></div>
-                  </div>
-                ))}
-              </div>
-            ) : stats.collegeDistribution.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-4xl mb-4">📊</div>
-                <p className="text-black/60 text-lg">No college data available yet</p>
-              </div>
-            ) : (
-              stats.collegeDistribution.map((college, index) => (
-                <div
-                  key={college.college}
-                  className="group flex items-center justify-between p-4 bg-black/5 rounded-2xl hover-lift transition-all duration-300"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-black/10 border border-black/20 rounded-lg flex items-center justify-center text-sm font-bold text-black">
-                      #{index + 1}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-black text-lg">
-                        {college.college}
-                      </div>
-                      <div className="text-sm text-black/60">
-                        {((college.count / stats.totalUsers) * 100).toFixed(1)}% of total users
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-black">
-                      {college.count.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-black/60">students</div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Summary */}
-          {!stats.loading && stats.collegeDistribution.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-black/10">
-              <div className="text-center">
-                <p className="text-black/70 text-lg">
-                  Total students from {stats.collegeDistribution.length} colleges
-                </p>
-                <p className="text-black/60 text-sm mt-1">
-                  Data shows university distribution across your platform
-                </p>
-              </div>
+          ) : stats.collegeDistribution.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-2">📊</div>
+              <p className="text-gray-600">No college data available yet</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 font-medium text-gray-600">#</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">College</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Students</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Share</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.collegeDistribution.slice(0, 10).map((college, index) => (
+                    <tr key={college.college} className="border-b last:border-0 border-gray-100 hover:bg-gray-50">
+                      <td className="px-4 py-3 w-12 text-gray-700">{index + 1}</td>
+                      <td className="px-4 py-3 text-gray-900 font-medium">{college.college}</td>
+                      <td className="px-4 py-3 text-gray-900">{college.count.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-gray-700">{((college.count / stats.totalUsers) * 100).toFixed(1)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-
-          {/* Geometric Accent */}
-          <div className="absolute bottom-4 right-4 w-16 h-16 border border-black/10 rounded-full"></div>
         </div>
 
         {/* Additional Stats Section */}

@@ -9,6 +9,28 @@ export async function GET(request: NextRequest) {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
+    // Safe counter that returns 0 if table doesn't exist or policy denies access
+    async function safeCount(
+      table: string,
+      sinceIso?: string,
+      timestampColumn: string = 'created_at'
+    ): Promise<number> {
+      try {
+        let q = supabase
+          .from(table)
+          .select('id', { count: 'exact', head: true })
+        if (sinceIso) q = q.gte(timestampColumn, sinceIso)
+        const { count, error } = await q
+        if (error) {
+          // Silently ignore; return 0 when the table is missing or blocked by RLS
+          return 0
+        }
+        return count || 0
+      } catch (_err) {
+        return 0
+      }
+    }
+
     // Fetch total users
     const { count: totalUsers, error: totalUsersError } = await supabase
       .from('profiles')
@@ -71,45 +93,11 @@ export async function GET(request: NextRequest) {
     // Fetch active users today (users who have been active in your actual app features)
     let activeUsersToday = 0
 
-    // Check messages activity (messaging is core to your app)
-    const { count: messagesToday, error: messagesError } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', oneDayAgo.toISOString())
-
-    if (messagesError) {
-      console.error('Error fetching messages today:', messagesError)
-    }
-
-    // Check housing listings activity (posting housing is a key feature)
-    const { count: housingListingsToday, error: housingError } = await supabase
-      .from('housing_listings')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', oneDayAgo.toISOString())
-
-    if (housingError) {
-      console.error('Error fetching housing listings today:', housingError)
-    }
-
-    // Check marketplace items activity (buying/selling is core feature)
-    const { count: marketplaceItemsToday, error: marketplaceError } = await supabase
-      .from('marketplace_items')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', oneDayAgo.toISOString())
-
-    if (marketplaceError) {
-      console.error('Error fetching marketplace items today:', marketplaceError)
-    }
-
-    // Check feedback submissions (user engagement)
-    const { count: feedbackToday, error: feedbackError } = await supabase
-      .from('feedback')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', oneDayAgo.toISOString())
-
-    if (feedbackError) {
-      console.error('Error fetching feedback today:', feedbackError)
-    }
+    // Use safe counters – return 0 on errors/missing tables
+    const messagesToday = await safeCount('messages', oneDayAgo.toISOString())
+    const housingListingsToday = await safeCount('housing_listings', oneDayAgo.toISOString())
+    const marketplaceItemsToday = await safeCount('marketplace_items', oneDayAgo.toISOString())
+    const feedbackToday = await safeCount('feedback', oneDayAgo.toISOString())
 
     // Estimate active users based on actual app activity (more accurate weights)
     activeUsersToday = Math.floor(
