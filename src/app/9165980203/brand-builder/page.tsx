@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
+ 
+// import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import StatCard from '@/components/admin/StatCard'
 
@@ -31,6 +33,10 @@ type OfferItem = {
 }
 
 export default function AdminBrandBuilder() {
+  // const router = useRouter()
+  
+  // slugify removed (unused)
+
   function getPathFromPublicUrl(publicUrl?: string | null): string | null {
     if (!publicUrl) return null
     const idx = publicUrl.indexOf('/brand_images/')
@@ -42,10 +48,12 @@ export default function AdminBrandBuilder() {
   const [brands, setBrands] = useState<BrandItem[]>([])
   const [loadingBrands, setLoadingBrands] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  // Derived map reserved for future cross-refs
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const brandIdToName = useMemo(() => Object.fromEntries(brands.map(b => [b.id, b.name])), [brands])
   const [categories, setCategories] = useState<Array<{ key: string, label: string }>>([])
 
+  // Brand form state
   const [brandForm, setBrandForm] = useState({
     name: '',
     website: '',
@@ -58,6 +66,7 @@ export default function AdminBrandBuilder() {
   const [brandMsg, setBrandMsg] = useState<string | null>(null)
   const brandDisabled = useMemo(() => brandForm.name.trim().length === 0, [brandForm.name])
 
+  // List toolbar & UX state
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [sortKey, setSortKey] = useState<'created_at' | 'name'>('created_at')
@@ -66,6 +75,7 @@ export default function AdminBrandBuilder() {
   const pageSize = 20
   const [totalBrands, setTotalBrands] = useState(0)
 
+  // Toasts
   const [toasts, setToasts] = useState<Array<{ id: number, type: 'success' | 'error', text: string }>>([])
   function pushToast(type: 'success' | 'error', text: string) {
     const id = Date.now()
@@ -73,8 +83,10 @@ export default function AdminBrandBuilder() {
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000)
   }
 
+  // total pages derived
   const totalPages = Math.max(1, Math.ceil(totalBrands / pageSize))
 
+  // Offer form state
   const [offerForm, setOfferForm] = useState({
     brand_id: '',
     title: '',
@@ -87,10 +99,12 @@ export default function AdminBrandBuilder() {
   const [offerMsg, setOfferMsg] = useState<string | null>(null)
   const offerDisabled = useMemo(() => !offerForm.brand_id || !offerForm.title || !offerForm.start_date || !offerForm.end_date, [offerForm])
 
+  // Listings (read/write)
   const [offers, setOffers] = useState<OfferItem[]>([])
   const [loadingOffers, setLoadingOffers] = useState<boolean>(true)
   const [editingBrandId] = useState<string | null>(null)
 
+  // Right-side edit drawer & confirm modal state (must be before any conditional returns)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [drawerKind, setDrawerKind] = useState<null | 'brand' | 'offer'>(null)
   const [drawerBrandId, setDrawerBrandId] = useState<string | null>(null)
@@ -101,7 +115,7 @@ export default function AdminBrandBuilder() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmTitle, setConfirmTitle] = useState('')
   const [confirmMessage, setConfirmMessage] = useState('')
-  const [confirmAction, setConfirmAction] = useState<null | (() => Promise<void> | void)>(null)
+  const [confirmAction, setConfirmAction] = useState<null | (() => void | Promise<void>)>(null)
 
   useEffect(() => {
     async function loadBrands() {
@@ -176,6 +190,7 @@ export default function AdminBrandBuilder() {
       category: brandForm.category || null
     }
 
+    // First create brand row to get a stable id
     const { data: created, error: createErr } = await supabase
       .from('brands')
       .insert([basePayload])
@@ -188,6 +203,7 @@ export default function AdminBrandBuilder() {
       return
     }
 
+    // Upload images into stable folder brands/<brandId>
     const updateFields: { logo_url?: string; cover_url?: string } = {}
     try {
       if (logoFile) {
@@ -274,6 +290,8 @@ export default function AdminBrandBuilder() {
     )
   }
 
+  // Right-side edit drawer & confirm modal state
+
   function openBrandDrawer(b: BrandItem) {
     setDrawerKind('brand')
     setDrawerBrandId(b.id)
@@ -325,6 +343,7 @@ export default function AdminBrandBuilder() {
           tags: drawerBrandDraft.tagsCsv ? drawerBrandDraft.tagsCsv.split(',').map(s => s.trim()).filter(Boolean) : null,
         }
 
+        // Handle image replacements/removals
         const current = brands.find(x => x.id === drawerBrandId)
         try {
           if (drawerBrandDraft.newLogoFile) {
@@ -399,6 +418,20 @@ export default function AdminBrandBuilder() {
     }
   }
 
+
+  const openConfirm = (title: string, message: string, action: () => void | Promise<void>) => {
+    setConfirmTitle(title)
+    setConfirmMessage(message)
+    setConfirmAction(() => action)
+    setConfirmOpen(true)
+  }
+  const closeConfirm = () => {
+    setConfirmOpen(false)
+    setConfirmTitle('')
+    setConfirmMessage('')
+    setConfirmAction(null)
+  }
+
   return (
     <div className="space-y-10">
       <div className="flex items-center justify-between">
@@ -413,12 +446,14 @@ export default function AdminBrandBuilder() {
         </div>
       </div>
 
+      {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard title="Brands" icon="🏷️" value={brands.length} loading={loadingBrands} />
         <StatCard title="Offers" icon="🎁" value={offers.length} loading={loadingOffers} />
         <StatCard title="Categories" icon="🗂️" value={categories.length} />
       </div>
 
+      {/* Brand Creator */}
       <section className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-black/10 glass-effect overflow-hidden p-8">
         <h2 className="text-xl font-semibold mb-4">Create Brand</h2>
         <form onSubmit={submitBrand} className="space-y-5">
@@ -443,6 +478,7 @@ export default function AdminBrandBuilder() {
                 <span>Click to upload logo</span>
               </label>
               {logoFile && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <div className="mt-2"><img src={URL.createObjectURL(logoFile)} alt="logo preview" className="h-14 w-14 object-cover rounded border" /></div>
               )}
               <p className="text-xs text-gray-500 mt-1">Square logo works best (PNG/SVG)</p>
@@ -454,6 +490,7 @@ export default function AdminBrandBuilder() {
                 <span>Click to upload cover</span>
               </label>
               {coverFile && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <div className="mt-2"><img src={URL.createObjectURL(coverFile)} alt="cover preview" className="h-16 w-28 object-cover rounded border" /></div>
               )}
               <p className="text-xs text-gray-500 mt-1">Suggested 1200×400 (JPG/PNG)</p>
@@ -469,14 +506,14 @@ export default function AdminBrandBuilder() {
               </select>
             </div>
             <div>
-              <label className="block text sm font-medium text-gray-700 mb-1">Tags</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
               <input className="border rounded-lg px-3 py-2 w-full" placeholder="e.g. apparel, student, tech" value={brandForm.tags} onChange={e => setBrandForm({ ...brandForm, tags: e.target.value })} />
               <p className="text-xs text-gray-500 mt-1">Comma-separated</p>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">About <span className="text-red-6 00">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">About <span className="text-red-600">*</span></label>
             <textarea className="border rounded-lg px-3 py-2 w-full" rows={4} placeholder="Short brand description" value={brandForm.about} onChange={e => setBrandForm({ ...brandForm, about: e.target.value })} required />
           </div>
 
@@ -487,6 +524,7 @@ export default function AdminBrandBuilder() {
         </form>
       </section>
 
+      {/* Offer Creator */}
       <section className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-black/10 glass-effect overflow-hidden p-8">
         <h2 className="text-xl font-semibold mb-4">Create Brand Offer</h2>
         <form onSubmit={submitOffer} className="space-y-5">
@@ -543,12 +581,14 @@ export default function AdminBrandBuilder() {
         </form>
       </section>
 
+      {/* Brands List */}
       <section className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-black/10 glass-effect overflow-hidden p-8">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Brands</h2>
           {loadingBrands && <div className="text-sm text-black/60">Loading…</div>}
         </div>
 
+        {/* Toolbar above list */}
         <div className="mt-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <input className="border rounded-lg px-3 py-2 text-sm" placeholder="Search brands, websites, tags" value={search} onChange={e => { setPage(0); setSearch(e.target.value) }} />
@@ -638,6 +678,7 @@ export default function AdminBrandBuilder() {
           )}
         </div>
 
+        {/* Pagination */}
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm text-gray-600">Page {page + 1} of {totalPages}{totalBrands ? ` • ${totalBrands} total` : ''}</div>
           <div className="flex items-center gap-2">
@@ -647,6 +688,7 @@ export default function AdminBrandBuilder() {
         </div>
       </section>
 
+      {/* Toasts */}
       {toasts.length > 0 && (
         <div className="fixed top-20 right-6 z-50 space-y-2">
           {toasts.map(t => (
@@ -657,10 +699,11 @@ export default function AdminBrandBuilder() {
         </div>
       )}
 
+      {/* Drawer */}
       {isDrawerOpen && (
         <div className="fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/30" onClick={closeDrawer}></div>
-          <aside className="absolute right-0 top-0 h-full w-full sm:w-[480px] bg白e shadow-2xl border-l border-black/10 p-6 overflow-y-auto">
+          <aside className="absolute right-0 top-0 h-full w-full sm:w-[480px] bg-white shadow-2xl border-l border-black/10 p-6 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">{drawerKind === 'brand' ? 'Edit Brand' : 'Edit Offer'}</h3>
               <button className="text-sm rounded px-3 py-1 border hover:bg-gray-50" onClick={closeDrawer}>Close</button>
@@ -724,6 +767,25 @@ export default function AdminBrandBuilder() {
           </aside>
         </div>
       )}
+
+      {/* Confirm Modal */}
+      {confirmOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/30" onClick={closeConfirm}></div>
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="w-full max-w-sm bg-white rounded-2xl border border-black/10 p-6 shadow-xl">
+              <h3 className="text-lg font-semibold mb-2">{confirmTitle}</h3>
+              <p className="text-sm text-gray-700 mb-4">{confirmMessage}</p>
+              <div className="flex items-center justify-end gap-2">
+                <button className="rounded px-4 py-2 border" onClick={closeConfirm}>Cancel</button>
+                <button className="bg-black text-white rounded px-4 py-2" onClick={async () => { if (confirmAction) await confirmAction(); closeConfirm() }}>Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
+
