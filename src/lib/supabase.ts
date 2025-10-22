@@ -10,24 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Database types for TypeScript
-export type VendorType = 'restaurant' | 'retail' | 'service' | 'entertainment' | 'health' | 'education' | 'technology' | 'other'
-
-// Centralized business types configuration
-export const BUSINESS_TYPES: { value: VendorType; label: string }[] = [
-  { value: 'restaurant', label: 'Restaurant/Food Service' },
-  { value: 'retail', label: 'Retail Store' },
-  { value: 'service', label: 'Professional Service' },
-  { value: 'entertainment', label: 'Entertainment/Recreation' },
-  { value: 'health', label: 'Health/Fitness' },
-  { value: 'education', label: 'Education/Tutoring' },
-  { value: 'technology', label: 'Technology' },
-  { value: 'other', label: 'Other' },
-]
-
-// Helper function to get valid business type values
-export const getValidBusinessTypes = (): VendorType[] => {
-  return BUSINESS_TYPES.map(type => type.value)
-}
+ 
 
 export interface Vendor {
   id?: string
@@ -44,7 +27,7 @@ export interface Vendor {
   about?: string
   website?: string
   tags?: string[]
-  vendor_type?: VendorType
+  vendor_type?: any
   user_id?: string
 }
 
@@ -52,7 +35,18 @@ export interface VendorSignupData {
   businessName: string
   email: string
   password: string
-  businessType: VendorType
+  businessType: any
+}
+
+// Interest/lead submission from vendors (no auth creation)
+export interface VendorInterestData {
+  businessName: string
+  email: string
+  contactName?: string
+  phone?: string
+  city?: string
+  state?: string
+  
 }
 
 // Offer related types

@@ -89,9 +89,9 @@ export default function VendorResetPassword() {
           text: 'Password updated successfully! Redirecting to login...'
         });
 
-        // Redirect to login after successful password reset
+        // After reset, go to vendor onboarding page
         setTimeout(() => {
-          router.push('/vendor/login?message=password_reset_success');
+          router.push('/vendor/signup');
         }, 2000);
       } else {
         setMessage({ type: 'error', text: data.error || 'Failed to reset password' });
@@ -258,14 +258,7 @@ export default function VendorResetPassword() {
             </div>
           </form>
 
-          <div className="mt-6 sm:mt-8 text-center">
-            <Link
-              href="/vendor/login"
-              className="text-sm text-black/70 hover:text-black font-medium transition-colors duration-300"
-            >
-              ← Back to login
-            </Link>
-          </div>
+          
         </div>
 
         <div className="mt-8 sm:mt-12 text-center">

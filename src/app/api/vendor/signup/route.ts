@@ -1,105 +1,66 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import type { VendorSignupData } from '@/lib/supabase'
-import { getValidBusinessTypes } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import type { VendorInterestData } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
-    const body: VendorSignupData = await request.json()
-    
-    // Validate required fields
-    const { businessName, email, password, businessType } = body
-    
-    if (!businessName || !email || !password || !businessType) {
+    const body: VendorInterestData = await request.json()
+
+    const {
+      businessName,
+      email,
+      contactName,
+      phone,
+      city,
+      state,
+    } = body
+
+    if (!businessName || !email) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    // Validate business type using centralized function
-    const validBusinessTypes = getValidBusinessTypes()
     
-    if (!validBusinessTypes.includes(businessType)) {
-      return NextResponse.json(
-        { error: 'Invalid business type' },
-        { status: 400 }
-      )
-    }
 
-    // Step 1: Create user account in Supabase Auth with OTP verification
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          business_name: businessName,
-          business_type: businessType,
-          role: 'vendor'
-        }
-      }
-    })
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const serverSupabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    if (authError) {
-      console.error('Auth error:', authError)
-      return NextResponse.json(
-        { error: 'Failed to create user account: ' + authError.message },
-        { status: 400 }
-      )
-    }
-
-    if (!authData.user) {
-      return NextResponse.json(
-        { error: 'Failed to create user account' },
-        { status: 400 }
-      )
-    }
-
-    // Step 2: Create vendor record in vendors table
-    // Note: phone, address, website will be added later in the dashboard
-    const { data: vendorData, error: vendorError } = await supabase
-      .from('vendors')
+    const { data, error } = await serverSupabase
+      .from('vendor_interests')
       .insert({
-        name: businessName,
-        email: email,
-        phone: '', // Will be added in dashboard
-        address: '', // Will be added in dashboard
-        latitude: 0, // Will be set when address is added
-        longitude: 0, // Will be set when address is added
-        logo_url: '/placeholder-logo.png', // TODO: Implement logo upload
-        vendor_type: businessType,
-        user_id: authData.user.id,
-        website: null, // Will be added in dashboard
+        business_name: businessName,
+        contact_name: contactName ?? null,
+        email,
+        phone: phone ?? null,
+        city: city ?? null,
+        state: state ?? null,
+        source: 'website',
       })
-      .select()
+      .select('id, created_at')
+      .single()
 
-    if (vendorError) {
-      console.error('Vendor creation error:', vendorError)
-      
-      // Note: User account was created but vendor record failed
-      // The user will need to complete their profile in the dashboard
-      // or contact support for assistance
-      
+    if (error) {
+      console.error('Vendor interest insert error:', error)
       return NextResponse.json(
-        { error: 'Failed to create vendor record: ' + vendorError.message },
-        { status: 500 }
+        { error: 'Failed to submit interest: ' + error.message },
+        { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Vendor account created successfully!',
+      message: 'Thanks! We received your interest and will reach out shortly.',
       data: {
-        user_id: authData.user.id,
-        vendor_id: vendorData?.[0]?.id,
-        vendor_pin: vendorData?.[0]?.vendor_pin, // Include the auto-generated PIN
-        email: email,
-        business_name: businessName
+        id: data.id,
+        created_at: data.created_at,
       }
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Signup error:', error)
+    console.error('Vendor interest error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

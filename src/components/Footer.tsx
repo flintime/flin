@@ -20,9 +20,7 @@ export default function Footer() {
                 className=""
               />
             </div>
-            <p className="text-white/70 text-sm mb-6 leading-relaxed">
-              The ultimate student platform connecting college students across America with local offers, student marketplace, housing listings, and campus events.
-            </p>
+            
             <div className="flex space-x-6">
               <a href="https://www.instagram.com/flin.college/" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-all duration-300 hover-lift">
                 <span className="sr-only">Instagram</span>

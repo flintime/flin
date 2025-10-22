@@ -150,15 +150,6 @@ export default function VendorForgotPassword() {
 
           <div className="mt-6 sm:mt-8 text-center space-y-4">
             <div>
-              <Link
-                href="/vendor/login"
-                className="text-sm text-black/70 hover:text-black font-medium transition-colors duration-300"
-              >
-                ← Back to login
-              </Link>
-            </div>
-
-            <div>
               <span className="text-sm text-black/60">Don't have an account? </span>
               <Link
                 href="/vendor/signup"

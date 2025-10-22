@@ -87,13 +87,7 @@
     <priority>0.3</priority>
   </url>
 
-  <!-- Vendor pages - noindex but include for completeness -->
-  <url>
-    <loc>https://flin.college/vendor/login</loc>
-    <lastmod>2024-12-31</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.1</priority>
-  </url>
+  <!-- Vendor pages -->
 
   <url>
     <loc>https://flin.college/vendor/signup</loc>
