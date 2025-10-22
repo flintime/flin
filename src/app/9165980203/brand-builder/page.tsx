@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import Image from 'next/image'
  
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import StatCard from '@/components/admin/StatCard'
 
@@ -32,15 +33,9 @@ type OfferItem = {
 }
 
 export default function AdminBrandBuilder() {
-  const router = useRouter()
+  // const router = useRouter()
   
-  function slugify(input: string): string {
-    return input
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '')
-      .slice(0, 60)
-  }
+  // slugify removed (unused)
 
   function getPathFromPublicUrl(publicUrl?: string | null): string | null {
     if (!publicUrl) return null
@@ -53,6 +48,8 @@ export default function AdminBrandBuilder() {
   const [brands, setBrands] = useState<BrandItem[]>([])
   const [loadingBrands, setLoadingBrands] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  // Derived map reserved for future cross-refs
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const brandIdToName = useMemo(() => Object.fromEntries(brands.map(b => [b.id, b.name])), [brands])
   const [categories, setCategories] = useState<Array<{ key: string, label: string }>>([])
 
@@ -105,10 +102,7 @@ export default function AdminBrandBuilder() {
   // Listings (read/write)
   const [offers, setOffers] = useState<OfferItem[]>([])
   const [loadingOffers, setLoadingOffers] = useState<boolean>(true)
-  const [editingBrandId, setEditingBrandId] = useState<string | null>(null)
-  const [brandEdits, setBrandEdits] = useState<Record<string, Partial<BrandItem> & { tagsCsv?: string, removeLogo?: boolean, removeCover?: boolean, newLogoFile?: File | null, newCoverFile?: File | null }>>({})
-  const [editingOfferId, setEditingOfferId] = useState<string | null>(null)
-  const [offerEdits, setOfferEdits] = useState<Record<string, Partial<OfferItem>>>({})
+  const [editingBrandId] = useState<string | null>(null)
 
   // Right-side edit drawer & confirm modal state (must be before any conditional returns)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -182,7 +176,13 @@ export default function AdminBrandBuilder() {
   async function submitBrand(e: React.FormEvent) {
     e.preventDefault()
     setBrandMsg(null)
-    const basePayload: any = {
+    const basePayload: {
+      name: string
+      website: string | null
+      about: string | null
+      tags: string[] | null
+      category: string | null
+    } = {
       name: brandForm.name.trim(),
       website: brandForm.website || null,
       about: brandForm.about || null,
@@ -204,7 +204,7 @@ export default function AdminBrandBuilder() {
     }
 
     // Upload images into stable folder brands/<brandId>
-    const updateFields: any = {}
+    const updateFields: { logo_url?: string; cover_url?: string } = {}
     try {
       if (logoFile) {
         const ext = (logoFile.name.split('.').pop() || 'jpg').toLowerCase()
@@ -222,9 +222,10 @@ export default function AdminBrandBuilder() {
         const { data: pub } = supabase.storage.from('brand_images').getPublicUrl(path)
         if (pub?.publicUrl) updateFields.cover_url = pub.publicUrl
       }
-    } catch (err: any) {
-      setBrandMsg(err?.message || 'Failed to upload images')
-      pushToast('error', err?.message || 'Failed to upload images')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to upload images'
+      setBrandMsg(message)
+      pushToast('error', message)
       return
     }
 
@@ -334,7 +335,7 @@ export default function AdminBrandBuilder() {
   async function saveDrawer() {
     try {
       if (drawerKind === 'brand' && drawerBrandId) {
-        const update: any = {
+        const update: Partial<BrandItem> & { tags?: string[] | null; logo_url?: string | null; cover_url?: string | null } = {
           name: (drawerBrandDraft.name || '').toString().trim(),
           website: (drawerBrandDraft.website || '') || null,
           about: (drawerBrandDraft.about || '') || null,
@@ -374,7 +375,7 @@ export default function AdminBrandBuilder() {
             const old = current?.cover_url ? getPathFromPublicUrl(current.cover_url) : null
             if (old) await supabase.storage.from('brand_images').remove([old])
           }
-        } catch (err) {
+        } catch {
           pushToast('error', 'Failed to update images')
           return
         }
@@ -391,7 +392,7 @@ export default function AdminBrandBuilder() {
         return
       }
       if (drawerKind === 'offer' && drawerOfferId) {
-        const update: any = {
+        const update: Partial<OfferItem> = {
           title: (drawerOfferDraft.title || '').toString().trim(),
           start_date: drawerOfferDraft.start_date || null,
           end_date: drawerOfferDraft.end_date || null,
@@ -411,8 +412,9 @@ export default function AdminBrandBuilder() {
         closeDrawer()
         return
       }
-    } catch (err: any) {
-      pushToast('error', err?.message || 'Failed to save')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save'
+      pushToast('error', message)
     }
   }
 
@@ -475,7 +477,10 @@ export default function AdminBrandBuilder() {
                 <input type="file" accept="image/*" className="hidden" onChange={e => setLogoFile(e.target.files?.[0] || null)} required />
                 <span>Click to upload logo</span>
               </label>
-              {logoFile && (<div className="mt-2"><img src={URL.createObjectURL(logoFile)} alt="logo preview" className="h-14 w-14 object-cover rounded border" /></div>)}
+              {logoFile && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <div className="mt-2"><img src={URL.createObjectURL(logoFile)} alt="logo preview" className="h-14 w-14 object-cover rounded border" /></div>
+              )}
               <p className="text-xs text-gray-500 mt-1">Square logo works best (PNG/SVG)</p>
             </div>
             <div>
@@ -484,7 +489,10 @@ export default function AdminBrandBuilder() {
                 <input type="file" accept="image/*" className="hidden" onChange={e => setCoverFile(e.target.files?.[0] || null)} required />
                 <span>Click to upload cover</span>
               </label>
-              {coverFile && (<div className="mt-2"><img src={URL.createObjectURL(coverFile)} alt="cover preview" className="h-16 w-28 object-cover rounded border" /></div>)}
+              {coverFile && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <div className="mt-2"><img src={URL.createObjectURL(coverFile)} alt="cover preview" className="h-16 w-28 object-cover rounded border" /></div>
+              )}
               <p className="text-xs text-gray-500 mt-1">Suggested 1200×400 (JPG/PNG)</p>
             </div>
           </div>
@@ -601,15 +609,18 @@ export default function AdminBrandBuilder() {
         <div className="space-y-4">
           {brands.map(b => {
             const isEditing = editingBrandId === b.id
-            const draft = brandEdits[b.id] || { ...b, tagsCsv: (b.tags || []).join(', '), removeLogo: false, removeCover: false, newLogoFile: null, newCoverFile: null }
             return (
               <div key={b.id} className="group relative bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 hover-lift glass-effect overflow-hidden p-6">
                 {!isEditing ? (
                   <div className="grid gap-2">
                     {(b.logo_url || b.cover_url) && (
                       <div className="flex gap-3 items-center">
-                        {b.logo_url && <img src={b.logo_url} alt="logo" className="h-10 w-10 object-cover rounded" />}
-                        {b.cover_url && <img src={b.cover_url} alt="cover" className="h-10 w-16 object-cover rounded" />}
+                        {b.logo_url && (
+                          <Image src={b.logo_url} alt="logo" width={40} height={40} className="h-10 w-10 object-cover rounded" />
+                        )}
+                        {b.cover_url && (
+                          <Image src={b.cover_url} alt="cover" width={64} height={40} className="h-10 w-16 object-cover rounded" />
+                        )}
                       </div>
                     )}
                     <div className="font-medium">{b.name}</div>
@@ -634,7 +645,6 @@ export default function AdminBrandBuilder() {
                       </div>
                       <div className="space-y-3 mt-2">
                         {offers.filter(o => o.brand_id === b.id).map(o => {
-                          const offerDraft = offerEdits[o.id] || { ...o }
                           return (
                             <div key={o.id} className="border border-black/10 rounded-2xl p-3">
                               <div className="grid gap-1">

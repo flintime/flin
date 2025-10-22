@@ -82,7 +82,7 @@ export default function AdminDashboard() {
             error: data.error || 'Failed to fetch user stats'
           })
         }
-      } catch (error) {
+      } catch {
         setStats({
           totalUsers: 0,
           totalVendors: 0,

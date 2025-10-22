@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
 // GET - Fetch comprehensive admin statistics
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const now = new Date()
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
           return 0
         }
         return count || 0
-      } catch (_err) {
+      } catch {
         return 0
       }
     }
@@ -56,9 +56,9 @@ export async function GET(request: NextRequest) {
       .not('university', 'is', null)
       .not('university', 'eq', '')
 
-    let collegeDistribution: { [key: string]: number } = {}
+    const collegeDistribution: { [key: string]: number } = {}
     if (collegeData && !collegeError) {
-      collegeData.forEach((profile: any) => {
+      collegeData.forEach((profile: { university?: string | null }) => {
         const college = profile.university || 'Unknown'
         collegeDistribution[college] = (collegeDistribution[college] || 0) + 1
       })
@@ -134,9 +134,9 @@ export async function GET(request: NextRequest) {
         databaseStatus = 'error'
         console.error('Database connectivity test failed:', dbTestError)
       }
-    } catch (error) {
+  } catch {
       databaseStatus = 'error'
-      console.error('Database connectivity test error:', error)
+    console.error('Database connectivity test error')
     }
 
     // Calculate storage usage (estimated based on actual app data)

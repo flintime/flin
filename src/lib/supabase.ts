@@ -27,7 +27,7 @@ export interface Vendor {
   about?: string
   website?: string
   tags?: string[]
-  vendor_type?: any
+  vendor_type?: string
   user_id?: string
 }
 
@@ -35,7 +35,7 @@ export interface VendorSignupData {
   businessName: string
   email: string
   password: string
-  businessType: any
+  businessType: string
 }
 
 // Interest/lead submission from vendors (no auth creation)

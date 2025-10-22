@@ -9,7 +9,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
-    let unsub: (() => void) | undefined
     supabase.auth.getSession().then(async ({ data }) => {
       const ok = await sessionIsAdminDb(data.session)
       setAuthed(ok)
@@ -22,8 +21,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       setAuthed(ok)
       if (!ok) window.location.href = '/9165980203/login'
     })
-    unsub = () => { sub.subscription.unsubscribe() }
-    return () => { unsub && unsub() }
+    return () => {
+      sub.subscription.unsubscribe()
+    }
   }, [])
 
   if (!checked) {
