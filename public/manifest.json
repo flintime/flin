@@ -1,0 +1,53 @@
+{
+  "name": "Flin - The Ultimate Student App",
+  "short_name": "Flin",
+  "description": "Discover local offers, marketplace deals, housing options, and events for college students",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["lifestyle", "education", "shopping"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icons/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Offers",
+      "short_name": "Offers",
+      "description": "Browse local student offers and deals",
+      "url": "/local-offers",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    },
+    {
+      "name": "Marketplace",
+      "short_name": "Marketplace",
+      "description": "Buy and sell with fellow students",
+      "url": "/marketplace",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    }
+  ]
+}
