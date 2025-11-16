@@ -94,76 +94,77 @@ export default function VendorForgotPassword() {
 
         <div className="mt-8 sm:mt-12 mx-auto w-full max-w-md relative z-10">
           <div className="bg-white/80 backdrop-blur-sm py-6 px-4 sm:py-12 sm:px-8 border border-black/10 rounded-2xl glass-effect hover-lift">
-          {/* Message Display */}
-          {message && (
-            <div
-              className={`mb-6 p-4 rounded-lg text-sm ${
-                message.type === 'success'
-                  ? 'bg-green-50 text-green-800 border border-green-200'
-                  : 'bg-red-50 text-red-800 border border-red-200'
-              }`}
-              role="status"
-              aria-live="polite"
-            >
-              {message.text}
-            </div>
-          )}
-
-          {/* Forgot Password Form */}
-          <form
-            className="space-y-6 sm:space-y-8"
-            onSubmit={handleSubmit}
-            aria-busy={isLoading}
-          >
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2 sm:mb-3">
-                Email address *
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base"
-                  placeholder="Enter your email"
-                />
+            {/* Message Display */}
+            {message && (
+              <div
+                className={`mb-6 p-4 rounded-lg text-sm ${
+                  message.type === 'success'
+                    ? 'bg-green-50 text-green-800 border border-green-200'
+                    : 'bg-red-50 text-red-800 border border-red-200'
+                }`}
+                role="status"
+                aria-live="polite"
+              >
+                {message.text}
               </div>
-            </div>
+            )}
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 sm:py-4 sm:px-6 border border-transparent text-base sm:text-lg font-medium rounded-xl text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300 hover-lift animate-glow disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
-                    Sending OTP...
-                  </div>
-                ) : (
-                  <>
-                    <span className="hidden sm:inline">Send Password Reset OTP</span>
-                    <span className="sm:hidden">Send OTP</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+            {/* Forgot Password Form */}
+            <form
+              className="space-y-6 sm:space-y-8"
+              onSubmit={handleSubmit}
+              aria-busy={isLoading}
+            >
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-black mb-2 sm:mb-3">
+                  Email address *
+                </label>
+                <div className="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
 
-          <div className="mt-6 sm:mt-8 text-center space-y-4">
-            <div>
-              <span className="text-sm text-black/60">Don't have an account? </span>
-              <Link
-                href="/vendor/signup"
-                className="text-sm font-medium text-black hover:text-black/80 underline decoration-2 underline-offset-4 transition-all duration-300"
-              >
-                Sign up
-              </Link>
+              <div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="group relative w-full flex justify-center py-3 px-4 sm:py-4 sm:px-6 border border-transparent text-base sm:text-lg font-medium rounded-xl text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300 hover-lift animate-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                      Sending OTP...
+                    </div>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Send Password Reset OTP</span>
+                      <span className="sm:hidden">Send OTP</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-6 sm:mt-8 text-center space-y-4">
+              <div>
+                <span className="text-sm text-black/60">Don't have an account? </span>
+                <Link
+                  href="/vendor/signup"
+                  className="text-sm font-medium text-black hover:text-black/80 underline decoration-2 underline-offset-4 transition-all duration-300"
+                >
+                  Sign up
+                </Link>
+              </div>
             </div>
           </div>
         </div>

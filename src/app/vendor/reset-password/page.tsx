@@ -136,136 +136,148 @@ export default function VendorResetPassword() {
 
         <div className="mt-8 sm:mt-12 mx-auto w-full max-w-md relative z-10">
           <div className="bg-white/80 backdrop-blur-sm py-6 px-4 sm:py-12 sm:px-8 border border-black/10 rounded-2xl glass-effect hover-lift">
-          {/* Message Display */}
-          {message && (
-            <div
-              className={`mb-6 p-4 rounded-lg text-sm ${
-                message.type === 'success'
-                  ? 'bg-green-50 text-green-800 border border-green-200'
-                  : 'bg-red-50 text-red-800 border border-red-200'
-              }`}
-              role="status"
-              aria-live="polite"
-            >
-              {message.text}
-            </div>
-          )}
-
-          {/* Reset Password Form */}
-          <form
-            className="space-y-6 sm:space-y-8"
-            onSubmit={handleSubmit}
-            aria-busy={isLoading}
-          >
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2 sm:mb-3">
-                Email Address *
-                {formData.email && <span className="text-xs text-black/60 ml-2">(pre-filled from forgot password)</span>}
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  readOnly={!!formData.email} // Make it read-only if pre-filled
-                  className={`appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
-                    formData.email ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
-                  placeholder="Enter your email address"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="otp" className="block text-sm font-medium text-black mb-2 sm:mb-3">
-                OTP Code *
-              </label>
-              <div className="relative">
-                <input
-                  id="otp"
-                  name="otp"
-                  type="text"
-                  required
-                  value={formData.otp}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    otp: e.target.value.replace(/\D/g, '').slice(0, 6)
-                  })}
-                  className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base text-center text-2xl font-mono tracking-widest"
-                  placeholder="000000"
-                  maxLength={6}
-                />
-              </div>
-              <p className="mt-1 text-xs text-black/60">Enter the 6-digit code sent to your email</p>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-2 sm:mb-3">
-                New Password *
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base"
-                  placeholder="Enter your new password"
-                  minLength={8}
-                />
-              </div>
-              <p className="mt-1 text-xs text-black/60">Password must be at least 8 characters long</p>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-black mb-2 sm:mb-3">
-                Confirm New Password *
-              </label>
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base"
-                  placeholder="Confirm your new password"
-                  minLength={8}
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 sm:py-4 sm:px-6 border border-transparent text-base sm:text-lg font-medium rounded-xl text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300 hover-lift animate-glow disabled:opacity-50 disabled:cursor-not-allowed"
+            {/* Message Display */}
+            {message && (
+              <div
+                className={`mb-6 p-4 rounded-lg text-sm ${
+                  message.type === 'success'
+                    ? 'bg-green-50 text-green-800 border border-green-200'
+                    : 'bg-red-50 text-red-800 border border-red-200'
+                }`}
+                role="status"
+                aria-live="polite"
               >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
-                    Updating password...
-                  </div>
-                ) : (
-                  <>
-                    <span className="hidden sm:inline">Update Password</span>
-                    <span className="sm:hidden">Update Password</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+                {message.text}
+              </div>
+            )}
 
-          
+            {/* Reset Password Form */}
+            <form
+              className="space-y-6 sm:space-y-8"
+              onSubmit={handleSubmit}
+              aria-busy={isLoading}
+            >
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-black mb-2 sm:mb-3">
+                  Email Address *
+                  {formData.email && (
+                    <span className="text-xs text-black/60 ml-2">
+                      (pre-filled from forgot password)
+                    </span>
+                  )}
+                </label>
+                <div className="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    readOnly={!!formData.email} // Make it read-only if pre-filled
+                    className={`appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
+                      formData.email ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
+                    placeholder="Enter your email address"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="otp" className="block text-sm font-medium text-black mb-2 sm:mb-3">
+                  OTP Code *
+                </label>
+                <div className="relative">
+                  <input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    required
+                    value={formData.otp}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        otp: e.target.value.replace(/\D/g, '').slice(0, 6),
+                      })
+                    }
+                    className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base text-center text-2xl font-mono tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-black/60">
+                  Enter the 6-digit code sent to your email
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-black mb-2 sm:mb-3">
+                  New Password *
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base"
+                    placeholder="Enter your new password"
+                    minLength={8}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-black/60">
+                  Password must be at least 8 characters long
+                </p>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-black mb-2 sm:mb-3"
+                >
+                  Confirm New Password *
+                </label>
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="appearance-none block w-full px-3 py-3 sm:px-4 sm:py-4 border border-black/20 rounded-xl placeholder-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-300 bg-white/50 backdrop-blur-sm text-base"
+                    placeholder="Confirm your new password"
+                    minLength={8}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="group relative w-full flex justify-center py-3 px-4 sm:py-4 sm:px-6 border border-transparent text-base sm:text-lg font-medium rounded-xl text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 transition-all duration-300 hover-lift animate-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                      Updating password...
+                    </div>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Update Password</span>
+                      <span className="sm:hidden">Update Password</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <div className="mt-8 sm:mt-12 text-center">
