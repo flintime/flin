@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
 import Image from 'next/image'
 import StatCard from '@/components/admin/StatCard'
 import { vendorSchema } from '@/lib/validation/schemas'
@@ -174,37 +173,36 @@ export default function AdminLocalOffersBuilder() {
     async function loadVendors() {
       setLoadingVendors(true)
       setError(null)
-      let query = supabase
-        .from('vendors')
-        .select(
-          'id, name, website, vendor_category_key, tags, about, logo_url, address, phone, email, latitude, longitude, created_at',
-          { count: 'exact' }
-        )
+      try {
+        const params = new URLSearchParams({
+          search,
+          filterCategory,
+          sortKey,
+          sortDir: sortDirDesc ? 'desc' : 'asc',
+          page: String(page),
+          pageSize: String(pageSize),
+        })
+        const resp = await fetch(`/api/admin/vendors?${params.toString()}`)
+        const json = await resp.json().catch(() => ({}))
 
-      const q = search.trim()
-      if (q) {
-        const like = `%${q}%`
-        query = query.or(`name.ilike.${like},address.ilike.${like},phone.ilike.${like}`)
-      }
-      if (filterCategory) {
-        query = query.eq('vendor_category_key', filterCategory)
-      }
-      query = query.order(sortKey, { ascending: !sortDirDesc })
+        if (!resp.ok || !json?.success) {
+          const msg = json?.error || 'Failed to load vendors'
+          setError(msg)
+          setVendors([])
+          setTotalVendors(0)
+          return
+        }
 
-      const from = page * pageSize
-      const to = from + pageSize - 1
-      query = query.range(from, to)
-
-      const { data, error, count } = await query
-      if (error) {
-        setError(error.message)
+        setVendors(json.data || [])
+        setTotalVendors(json.total || 0)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to load vendors'
+        setError(msg)
         setVendors([])
         setTotalVendors(0)
-      } else {
-        setVendors(data || [])
-        setTotalVendors(count || 0)
+      } finally {
+        setLoadingVendors(false)
       }
-      setLoadingVendors(false)
     }
     loadVendors()
   }, [search, filterCategory, sortKey, sortDirDesc, page])
@@ -212,12 +210,17 @@ export default function AdminLocalOffersBuilder() {
   // Load categories once – they rarely change
   useEffect(() => {
     async function loadCategories() {
-      const { data } = await supabase
-        .from('offer_categories')
-        .select('key, label')
-        .eq('active', true)
-        .order('sort_order')
-      setCategories(data || [])
+      try {
+        const resp = await fetch('/api/admin/offer-categories')
+        const json = await resp.json().catch(() => ({}))
+        if (resp.ok && json?.success) {
+          setCategories(json.data || [])
+        } else {
+          setCategories([])
+        }
+      } catch {
+        setCategories([])
+      }
     }
     loadCategories()
   }, [])
@@ -232,16 +235,21 @@ export default function AdminLocalOffersBuilder() {
 
       setLoadingOffers(true)
       const vendorIds = vendors.map(v => v.id)
-      const { data, error } = await supabase
-        .from('offers')
-        .select('id, vendor_id, title, start_date, end_date, terms_conditions, featured, created_at')
-        .in('vendor_id', vendorIds)
-        .order('created_at', { ascending: false })
-
-      if (!error) {
-        setOffers(data || [])
+      try {
+        const resp = await fetch(
+          '/api/admin/vendor-offers/list?vendorIds=' + encodeURIComponent(vendorIds.join(','))
+        )
+        const json = await resp.json().catch(() => ({}))
+        if (resp.ok && json?.success) {
+          setOffers(json.data || [])
+        } else {
+          setOffers([])
+        }
+      } catch {
+        setOffers([])
+      } finally {
+        setLoadingOffers(false)
       }
-      setLoadingOffers(false)
     }
 
     loadOffersForVisibleVendors()
@@ -257,22 +265,28 @@ export default function AdminLocalOffersBuilder() {
 
       setLoadingVendorCoverImages(true)
       const vendorIds = vendors.map(v => v.id)
-      const { data, error } = await supabase
-        .from('vendor_images')
-        .select('id, vendor_id, image_url, is_primary, sort_order, created_at')
-        .in('vendor_id', vendorIds)
-        .order('sort_order', { ascending: true })
-
-      if (!error) {
-        const map: Record<string, VendorImageItem[]> = {}
-        for (const img of data || []) {
-          const vid = (img as VendorImageItem).vendor_id
-          if (!map[vid]) map[vid] = []
-          map[vid].push(img as VendorImageItem)
+      try {
+        const resp = await fetch(
+          '/api/admin/vendor-images/list?vendorIds=' + encodeURIComponent(vendorIds.join(','))
+        )
+        const json = await resp.json().catch(() => ({}))
+        if (resp.ok && json?.success) {
+          const incoming: VendorImageItem[] = json.data || []
+          const map: Record<string, VendorImageItem[]> = {}
+          for (const img of incoming) {
+            const vid = img.vendor_id
+            if (!map[vid]) map[vid] = []
+            map[vid].push(img)
+          }
+          setVendorCoverImagesMap(map)
+        } else {
+          setVendorCoverImagesMap({})
         }
-        setVendorCoverImagesMap(map)
+      } catch {
+        setVendorCoverImagesMap({})
+      } finally {
+        setLoadingVendorCoverImages(false)
       }
-      setLoadingVendorCoverImages(false)
     }
 
     loadCoverImagesForVisibleVendors()
@@ -490,28 +504,26 @@ export default function AdminLocalOffersBuilder() {
       setVendorForm({ name: '', website: '', address: '', phone: '', email: '', about: '', tags: '', category: '', latitude: '', longitude: '' })
       setLogoFile(null)
       setCoverFiles([])
-      // Reload vendors with current filters/pagination
-      let reloadQuery = supabase
-        .from('vendors')
-        .select('id, name, website, vendor_category_key, tags, about, logo_url, address, phone, email, latitude, longitude, created_at', { count: 'exact' })
-      
-      const q = search.trim()
-      if (q) {
-        const like = `%${q}%`
-        reloadQuery = reloadQuery.or(`name.ilike.${like},address.ilike.${like},phone.ilike.${like}`)
+      // Reload first page of vendors via server-side listing API
+      try {
+        const params = new URLSearchParams({
+          search: '',
+          filterCategory: '',
+          sortKey: 'created_at',
+          sortDir: 'desc',
+          page: '0',
+          pageSize: String(pageSize),
+        })
+        const resp = await fetch(`/api/admin/vendors?${params.toString()}`)
+        const json = await resp.json().catch(() => ({}))
+        if (resp.ok && json?.success) {
+          setVendors(json.data || [])
+          setTotalVendors(json.total || 0)
+          setPage(0)
+        }
+      } catch {
+        // leave existing list if refresh fails
       }
-      if (filterCategory) {
-        reloadQuery = reloadQuery.eq('vendor_category_key', filterCategory)
-      }
-      reloadQuery = reloadQuery.order(sortKey, { ascending: !sortDirDesc })
-      
-      const from = page * pageSize
-      const to = from + pageSize - 1
-      reloadQuery = reloadQuery.range(from, to)
-      
-      const { data: refreshed, count } = await reloadQuery
-      setVendors(refreshed || [])
-      setTotalVendors(count || 0)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred'
       setVendorMsg(message)
@@ -613,15 +625,20 @@ export default function AdminLocalOffersBuilder() {
       setOfferMsg(`Created offer: ${createData?.data?.title}`)
       pushToast('success', `Created offer: ${createData?.data?.title}`)
       setOfferForm({ vendor_id: '', title: '', start_date: '', end_date: '', terms_conditions: '', featured: false })
-      // Reload offers for the current vendor page
+      // Reload offers for visible vendors via server-side offers listing API
       if (vendors.length) {
-      const vendorIds = vendors.map(v => v.id)
-        const { data: refreshed } = await supabase
-          .from('offers')
-          .select('id, vendor_id, title, start_date, end_date, terms_conditions, featured, created_at')
-          .in('vendor_id', vendorIds)
-          .order('created_at', { ascending: false })
-        setOffers(refreshed || [])
+        const vendorIds = vendors.map(v => v.id)
+        try {
+          const resp = await fetch(
+            '/api/admin/vendor-offers/list?vendorIds=' + encodeURIComponent(vendorIds.join(','))
+          )
+          const json = await resp.json().catch(() => ({}))
+          if (resp.ok && json?.success) {
+            setOffers(json.data || [])
+          }
+        } catch {
+          // keep existing offers if refresh fails
+        }
       }
     } finally {
       setSubmittingOffer(false)
@@ -652,13 +669,21 @@ export default function AdminLocalOffersBuilder() {
     
     // Load vendor images
     setLoadingVendorImages(true)
-    const { data, error } = await supabase
-      .from('vendor_images')
-      .select('id, vendor_id, image_url, is_primary, sort_order, created_at')
-      .eq('vendor_id', v.id)
-      .order('sort_order', { ascending: true })
-    if (!error) setVendorImages(data || [])
-    setLoadingVendorImages(false)
+    try {
+      const resp = await fetch(
+        '/api/admin/vendor-images/list?vendorIds=' + encodeURIComponent(v.id)
+      )
+      const json = await resp.json().catch(() => ({}))
+      if (resp.ok && json?.success) {
+        setVendorImages((json.data || []) as VendorImageItem[])
+      } else {
+        setVendorImages([])
+      }
+    } catch {
+      setVendorImages([])
+    } finally {
+      setLoadingVendorImages(false)
+    }
   }
   function openOfferDrawer(o: LocalOfferItem) {
     setDrawerKind('offer')
@@ -778,12 +803,13 @@ export default function AdminLocalOffersBuilder() {
               }
             }
             // Reload vendor images
-            const { data: refreshedImages } = await supabase
-              .from('vendor_images')
-              .select('id, vendor_id, image_url, is_primary, sort_order, created_at')
-              .eq('vendor_id', drawerVendorId)
-              .order('sort_order', { ascending: true })
-            setVendorImages(refreshedImages || [])
+            const resp = await fetch(
+              '/api/admin/vendor-images/list?vendorIds=' + encodeURIComponent(drawerVendorId)
+            )
+            const json = await resp.json().catch(() => ({}))
+            if (resp.ok && json?.success) {
+              setVendorImages((json.data || []) as VendorImageItem[])
+            }
             // Clear new cover files after upload
             setDrawerVendorDraft(s => ({ ...s, newCoverFiles: [] }))
           } catch (err) {
@@ -793,26 +819,40 @@ export default function AdminLocalOffersBuilder() {
           }
         }
 
-        const { data, error } = await supabase
-          .from('vendors')
-          .update(update)
-          .eq('id', drawerVendorId)
-          .select('id, name, website, vendor_category_key, tags, about, logo_url, address, phone, email, latitude, longitude, created_at')
-          .single()
-        if (error) throw error
-        setVendors(prev => prev.map(x => x.id === drawerVendorId ? (data as VendorItem) : x))
+        const csrfToken = getCookie('csrf-token')
+        const resp = await fetch('/api/admin/vendors', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+          },
+          body: JSON.stringify({ id: drawerVendorId, ...update }),
+        })
+        const result = await resp.json().catch(() => ({}))
+        if (!resp.ok || !result?.success) {
+          throw new Error(result?.error || 'Failed to save vendor')
+        }
+        setVendors(prev =>
+          prev.map(x => (x.id === drawerVendorId ? (result.data as VendorItem) : x))
+        )
         
         // Reload vendor images after save
-        const { data: refreshedImages } = await supabase
-          .from('vendor_images')
-          .select('id, vendor_id, image_url, is_primary, sort_order, created_at')
-          .eq('vendor_id', drawerVendorId)
-          .order('sort_order', { ascending: true })
-        setVendorImages(refreshedImages || [])
-        setVendorCoverImagesMap(prev => ({
-          ...prev,
-          [drawerVendorId]: (refreshedImages || []) as VendorImageItem[],
-        }))
+        try {
+          const imgResp = await fetch(
+            '/api/admin/vendor-images/list?vendorIds=' + encodeURIComponent(drawerVendorId)
+          )
+          const imgJson = await imgResp.json().catch(() => ({}))
+          if (imgResp.ok && imgJson?.success) {
+            const refreshedImages: VendorImageItem[] = imgJson.data || []
+            setVendorImages(refreshedImages)
+            setVendorCoverImagesMap(prev => ({
+              ...prev,
+              [drawerVendorId]: refreshedImages,
+            }))
+          }
+        } catch {
+          // ignore refresh errors
+        }
         
         pushToast('success', 'Vendor saved')
         // Don't close drawer automatically - let user see the updated images
@@ -1475,16 +1515,23 @@ export default function AdminLocalOffersBuilder() {
                                   })
                                   const result = await resp.json().catch(() => ({}))
                                   if (resp.ok && result?.success) {
-                                    const { data: refreshedImages } = await supabase
-                                      .from('vendor_images')
-                                      .select('id, vendor_id, image_url, is_primary, sort_order, created_at')
-                                      .eq('vendor_id', drawerVendorId!)
-                                      .order('sort_order', { ascending: true })
-                                    setVendorImages(refreshedImages || [])
-                                    setVendorCoverImagesMap(prev => ({
-                                      ...prev,
-                                      [drawerVendorId!]: (refreshedImages || []) as VendorImageItem[],
-                                    }))
+                                    try {
+                                      const imgResp = await fetch(
+                                        '/api/admin/vendor-images/list?vendorIds=' +
+                                          encodeURIComponent(drawerVendorId!)
+                                      )
+                                      const imgJson = await imgResp.json().catch(() => ({}))
+                                      if (imgResp.ok && imgJson?.success) {
+                                        const refreshedImages: VendorImageItem[] = imgJson.data || []
+                                        setVendorImages(refreshedImages || [])
+                                        setVendorCoverImagesMap(prev => ({
+                                          ...prev,
+                                          [drawerVendorId!]: refreshedImages,
+                                        }))
+                                      }
+                                    } catch {
+                                      // ignore refresh errors
+                                    }
                                     pushToast('success', 'Cover image deleted')
                                   } else {
                                     pushToast('error', result?.error || 'Failed to delete image')

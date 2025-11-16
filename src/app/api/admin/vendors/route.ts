@@ -6,6 +6,87 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { verifyCsrfToken } from '@/lib/csrf'
 
+// GET - List vendors with filters, sorting, and pagination (admin UI)
+export async function GET(request: NextRequest) {
+  const adminCheck = await requireAdmin(request)
+  if (adminCheck.error) {
+    return adminCheck.response
+  }
+
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll() {
+            // handled by middleware
+          },
+        },
+      }
+    )
+
+    const url = new URL(request.url)
+    const search = (url.searchParams.get('search') || '').trim()
+    const filterCategory = url.searchParams.get('filterCategory') || ''
+    const sortKeyParam = url.searchParams.get('sortKey') || 'created_at'
+    const sortDirParam = url.searchParams.get('sortDir') || 'desc'
+    const page = Number.parseInt(url.searchParams.get('page') || '0', 10) || 0
+    const pageSize = Number.parseInt(url.searchParams.get('pageSize') || '20', 10) || 20
+
+    const sortKey = sortKeyParam === 'name' ? 'name' : 'created_at'
+    const ascending = sortDirParam === 'asc'
+
+    let query = supabase
+      .from('vendors')
+      .select(
+        'id, name, website, vendor_category_key, tags, about, logo_url, address, phone, email, latitude, longitude, created_at',
+        { count: 'exact' }
+      )
+
+    if (search) {
+      const like = `%${search}%`
+      query = query.or(`name.ilike.${like},address.ilike.${like},phone.ilike.${like}`)
+    }
+    if (filterCategory) {
+      query = query.eq('vendor_category_key', filterCategory)
+    }
+
+    query = query.order(sortKey, { ascending })
+
+    const from = page * pageSize
+    const to = from + pageSize - 1
+    query = query.range(from, to)
+
+    const { data, error, count } = await query
+    if (error) {
+      logger.error('Failed to list vendors', error, {
+        adminId: adminCheck.admin?.userId,
+      })
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: data || [],
+      total: count || 0,
+    })
+  } catch (error) {
+    logger.error('Unexpected error in vendor list API', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 // POST - Create a new vendor
 export async function POST(request: NextRequest) {
   // Verify admin access

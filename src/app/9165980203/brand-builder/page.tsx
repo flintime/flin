@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
 import Image from 'next/image'
 import StatCard from '@/components/admin/StatCard'
 import { brandSchema } from '@/lib/validation/schemas'
@@ -151,34 +150,36 @@ export default function AdminBrandBuilder() {
     async function loadBrands() {
       setLoadingBrands(true)
       setError(null)
-      let query = supabase
-        .from('brands')
-        .select('id, name, website, category, tags, about, logo_url, cover_url, sort_order, created_at', { count: 'planned' })
+      try {
+        const params = new URLSearchParams({
+          search,
+          filterCategory,
+          sortKey,
+          sortDir: sortDirDesc ? 'desc' : 'asc',
+          page: String(page),
+          pageSize: String(pageSize),
+        })
+        const resp = await fetch(`/api/admin/brands?${params.toString()}`)
+        const json = await resp.json().catch(() => ({}))
 
-      const q = search.trim()
-      if (q) {
-        const like = `%${q}%`
-        query = query.or(`name.ilike.${like},website.ilike.${like}`)
-      }
-      if (filterCategory) {
-        query = query.eq('category', filterCategory)
-      }
-      query = query.order(sortKey, { ascending: !sortDirDesc })
+        if (!resp.ok || !json?.success) {
+          const msg = json?.error || 'Failed to load brands'
+          setError(msg)
+          setBrands([])
+          setTotalBrands(0)
+          return
+        }
 
-      const from = page * pageSize
-      const to = from + pageSize - 1
-      query = query.range(from, to)
-
-      const { data, error, count } = await query
-      if (error) {
-        setError(error.message)
+        setBrands(json.data || [])
+        setTotalBrands(json.total || 0)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to load brands'
+        setError(msg)
         setBrands([])
         setTotalBrands(0)
-      } else {
-        setBrands(data || [])
-        setTotalBrands(count || 0)
+      } finally {
+        setLoadingBrands(false)
       }
-      setLoadingBrands(false)
     }
     loadBrands()
   }, [search, filterCategory, sortKey, sortDirDesc, page])
@@ -186,8 +187,17 @@ export default function AdminBrandBuilder() {
   // Load categories once – they change rarely and don't depend on filters/pagination
   useEffect(() => {
     async function loadCategories() {
-      const { data } = await supabase.from('brand_offer_categories').select('key, label').order('label')
-      setCategories(data || [])
+      try {
+        const resp = await fetch('/api/admin/brand-offer-categories')
+        const json = await resp.json().catch(() => ({}))
+        if (resp.ok && json?.success) {
+          setCategories(json.data || [])
+        } else {
+          setCategories([])
+        }
+      } catch {
+        setCategories([])
+      }
     }
     loadCategories()
   }, [])
@@ -203,16 +213,21 @@ export default function AdminBrandBuilder() {
 
       setLoadingOffers(true)
       const brandIds = brands.map(b => b.id)
-      const { data, error } = await supabase
-        .from('brand_offers')
-        .select('id, brand_id, title, start_date, end_date, terms_conditions, featured, discount_type, created_at')
-        .in('brand_id', brandIds)
-        .order('created_at', { ascending: false })
-
-      if (!error) {
-        setOffers(data || [])
+      try {
+        const resp = await fetch(
+          '/api/admin/brand-offers/list?brandIds=' + encodeURIComponent(brandIds.join(','))
+        )
+        const json = await resp.json().catch(() => ({}))
+        if (resp.ok && json?.success) {
+          setOffers(json.data || [])
+        } else {
+          setOffers([])
+        }
+      } catch {
+        setOffers([])
+      } finally {
+        setLoadingOffers(false)
       }
-      setLoadingOffers(false)
     }
 
     loadOffersForVisibleBrands()
@@ -388,8 +403,26 @@ export default function AdminBrandBuilder() {
     setBrandForm({ name: '', website: '', about: '', tags: '', category: '', sort_order: '' })
     setLogoFile(null)
     setCoverFile(null)
-    const { data: refreshed } = await supabase.from('brands').select('id, name, website, category, tags, about, logo_url, cover_url, sort_order, created_at').order('created_at', { ascending: false })
-    setBrands(refreshed || [])
+    // Reload first page using the server-side listing API
+    try {
+      const params = new URLSearchParams({
+        search: '',
+        filterCategory: '',
+        sortKey: 'created_at',
+        sortDir: 'desc',
+        page: '0',
+        pageSize: String(pageSize),
+      })
+      const resp = await fetch(`/api/admin/brands?${params.toString()}`)
+      const json = await resp.json().catch(() => ({}))
+      if (resp.ok && json?.success) {
+        setBrands(json.data || [])
+        setTotalBrands(json.total || 0)
+        setPage(0)
+      }
+    } catch {
+      // leave existing list if refresh fails
+    }
     setSubmittingBrand(false)
   }
 
@@ -552,14 +585,22 @@ export default function AdminBrandBuilder() {
           pushToast('error', e instanceof Error ? e.message : 'Failed to update images')
           return
         }
-        const { data, error } = await supabase
-          .from('brands')
-          .update(update)
-          .eq('id', drawerBrandId)
-          .select('id, name, website, category, tags, about, logo_url, cover_url, created_at')
-          .single()
-        if (error) throw error
-        setBrands(prev => prev.map(x => x.id === drawerBrandId ? (data as BrandItem) : x))
+        const csrfToken = getCookie('csrf-token')
+        const resp = await fetch('/api/admin/brands', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+          },
+          body: JSON.stringify({ id: drawerBrandId, ...update }),
+        })
+        const result = await resp.json().catch(() => ({}))
+        if (!resp.ok || !result?.success) {
+          throw new Error(result?.error || 'Failed to save brand')
+        }
+        setBrands(prev =>
+          prev.map(x => (x.id === drawerBrandId ? (result.data as BrandItem) : x))
+        )
         pushToast('success', 'Brand saved')
         closeDrawer()
         return
