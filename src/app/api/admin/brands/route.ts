@@ -191,6 +191,148 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// PUT - Update an existing brand
+export async function PUT(request: NextRequest) {
+  const adminCheck = await requireAdmin(request)
+  if (adminCheck.error) {
+    return adminCheck.response
+  }
+
+  try {
+    const body = await request.json().catch(() => ({}))
+    const { id, name, website, about, tags, category, sort_order, logo_url, cover_url } = body || {}
+
+    if (!id) {
+      return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    }
+
+    // Build a validation view using the same brandSchema (string-based)
+    const validationInput: Record<string, unknown> = {}
+    if (name !== undefined) validationInput.name = String(name)
+    if (website !== undefined) validationInput.website = (website ?? '') as string
+    if (about !== undefined) validationInput.about = (about ?? '') as string
+    if (category !== undefined) validationInput.category = (category ?? '') as string
+    if (tags !== undefined) {
+      if (Array.isArray(tags)) {
+        validationInput.tags = (tags as string[]).join(', ')
+      } else if (typeof tags === 'string') {
+        validationInput.tags = tags
+      } else {
+        validationInput.tags = ''
+      }
+    }
+    if (sort_order !== undefined) {
+      validationInput.sort_order =
+        sort_order === null || sort_order === '' ? '' : String(sort_order)
+    }
+
+    if (Object.keys(validationInput).length > 0) {
+      const validationResult = brandSchema.partial().safeParse(validationInput)
+      if (!validationResult.success) {
+        const firstError = validationResult.error.issues[0]
+        const message = firstError?.message || 'Validation failed'
+        return NextResponse.json({ error: message }, { status: 400 })
+      }
+    }
+
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll() {
+            // handled by middleware
+          },
+        },
+      }
+    )
+
+    const payload: Record<string, unknown> = {}
+    if (name !== undefined) {
+      payload.name = String(name).trim()
+    }
+    if (website !== undefined) {
+      const w = (website ?? '') as string
+      payload.website = w.trim() ? w.trim() : null
+    }
+    if (about !== undefined) {
+      const a = (about ?? '') as string
+      payload.about = a.trim() ? a.trim() : null
+    }
+    if (category !== undefined) {
+      const c = (category ?? '') as string
+      payload.category = c.trim() ? c.trim() : null
+    }
+    if (tags !== undefined) {
+      if (Array.isArray(tags)) {
+        payload.tags = (tags as string[]).map(t => t.trim()).filter(Boolean)
+      } else if (typeof tags === 'string') {
+        payload.tags = tags
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean)
+      } else {
+        payload.tags = null
+      }
+    }
+    if (sort_order !== undefined) {
+      if (sort_order === null || sort_order === '') {
+        payload.sort_order = null
+      } else {
+        const parsed = Number.parseInt(String(sort_order), 10)
+        payload.sort_order = Number.isNaN(parsed) ? null : parsed
+      }
+    }
+    if (logo_url !== undefined) {
+      payload.logo_url = logo_url
+    }
+    if (cover_url !== undefined) {
+      payload.cover_url = cover_url
+    }
+
+    if (Object.keys(payload).length === 0) {
+      return NextResponse.json(
+        { error: 'No fields provided to update' },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await supabase
+      .from('brands')
+      .update(payload)
+      .eq('id', id)
+      .select('id, name, website, category, tags, about, logo_url, cover_url, sort_order, created_at')
+      .single()
+
+    if (error) {
+      logger.error('Failed to update brand', error, {
+        adminId: adminCheck.admin?.userId,
+        brandId: id,
+        payload,
+      })
+      return NextResponse.json(
+        { error: error.message || 'Failed to update brand' },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data,
+    })
+  } catch (error) {
+    logger.error('Unexpected error in brand update API', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 // DELETE - Remove a brand and associated images/offers
 export async function DELETE(request: NextRequest) {
   const adminCheck = await requireAdmin(request)
