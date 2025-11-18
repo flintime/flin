@@ -40,7 +40,7 @@ export default function AdminBrandBuilder() {
   async function validateCoverImageClient(file: File): Promise<{ valid: boolean; error?: string }> {
     return new Promise(resolve => {
       const url = URL.createObjectURL(file)
-      const img = new Image()
+      const img = new window.Image()
       img.onload = () => {
         URL.revokeObjectURL(url)
         const width = img.naturalWidth
