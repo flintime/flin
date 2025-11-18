@@ -37,49 +37,95 @@ export default function AdminBrandBuilder() {
   
   // slugify removed (unused)
 
-  async function validateCoverImageClient(file: File): Promise<{ valid: boolean; error?: string }> {
-    return new Promise(resolve => {
-      const url = URL.createObjectURL(file)
-      const img = new window.Image()
+  async function resizeCoverImage(file: File): Promise<File> {
+    // SVG covers are not supported server-side, so fail fast here with a clearer message.
+    if (file.type === 'image/svg+xml') {
+      throw new Error(
+        'SVG cover images are not supported. Please upload a JPEG, PNG, or WebP image – it will be auto-resized for you.'
+      )
+    }
+
+    const targetWidth = 1120
+    const targetHeight = 640
+    const targetAspect = targetWidth / targetHeight
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = () => reject(new Error('Failed to read image file'))
+      reader.readAsDataURL(file)
+    })
+
+    const img = new window.Image()
+
+    return new Promise<File>((resolve, reject) => {
       img.onload = () => {
-        URL.revokeObjectURL(url)
-        const width = img.naturalWidth
-        const height = img.naturalHeight
+        const srcWidth = img.naturalWidth || img.width
+        const srcHeight = img.naturalHeight || img.height
 
-        const minWidth = 1120
-        const minHeight = 640
-        const targetAspect = 7 / 4
-        const tolerance = 0.05
-
-        if (width < minWidth || height < minHeight) {
-          resolve({
-            valid: false,
-            error: `Image is too small. Minimum size is ${minWidth}x${minHeight}px.`,
-          })
+        if (!srcWidth || !srcHeight) {
+          reject(
+            new Error(
+              'Unable to read image dimensions. Please upload a standard JPEG, PNG, or WebP file.'
+            )
+          )
           return
         }
 
-        const aspect = width / height
-        const diff = Math.abs(aspect - targetAspect)
-        if (diff > tolerance) {
-          resolve({
-            valid: false,
-            error:
-              'Image must be a landscape cover in approximately 7:4 (≈16:9) aspect ratio and at least 1120x640px.',
-          })
+        const canvas = document.createElement('canvas')
+        canvas.width = targetWidth
+        canvas.height = targetHeight
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Failed to prepare image canvas'))
           return
         }
 
-        resolve({ valid: true })
+        const srcAspect = srcWidth / srcHeight
+        let sx = 0
+        let sy = 0
+        let sw = srcWidth
+        let sh = srcHeight
+
+        // Center-crop to the target 7:4 aspect ratio while preserving as much as possible.
+        if (srcAspect > targetAspect) {
+          // Source is too wide – crop horizontally.
+          sh = srcHeight
+          sw = sh * targetAspect
+          sx = (srcWidth - sw) / 2
+        } else {
+          // Source is too tall – crop vertically.
+          sw = srcWidth
+          sh = sw / targetAspect
+          sy = (srcHeight - sh) / 2
+        }
+
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight)
+
+        const preferredType =
+          file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/jpeg'
+            ? file.type
+            : 'image/jpeg'
+
+        canvas.toBlob(
+          blob => {
+            if (!blob) {
+              reject(new Error('Failed to generate resized image'))
+              return
+            }
+            const resizedFile = new File([blob], file.name, { type: preferredType })
+            resolve(resizedFile)
+          },
+          preferredType,
+          0.9
+        )
       }
       img.onerror = () => {
-        URL.revokeObjectURL(url)
-        resolve({
-          valid: false,
-          error: 'Unable to read image dimensions. Please upload a standard JPEG, PNG, or WebP file.',
-        })
+        reject(
+          new Error('Unable to read image. Please upload a standard JPEG, PNG, or WebP file.')
+        )
       }
-      img.src = url
+      img.src = dataUrl
     })
   }
 
@@ -779,15 +825,19 @@ export default function AdminBrandBuilder() {
                     return
                   }
 
-                  const validation = await validateCoverImageClient(file)
-                  if (!validation.valid) {
+                  try {
+                    const resized = await resizeCoverImage(file)
+                    setCoverFile(resized)
+                    pushToast('success', 'Cover image auto-resized to 1120×640')
+                  } catch (err) {
+                    const message =
+                      err instanceof Error
+                        ? err.message
+                        : 'Unable to process cover image. Please try a different file.'
                     setCoverFile(null)
-                    pushToast('error', validation.error || 'Invalid cover image')
+                    pushToast('error', message)
                     e.target.value = ''
-                    return
                   }
-
-                  setCoverFile(file)
                 }}
                 required
               />
@@ -1232,15 +1282,23 @@ export default function AdminBrandBuilder() {
                             return
                           }
 
-                          const validation = await validateCoverImageClient(file)
-                          if (!validation.valid) {
+                          try {
+                            const resized = await resizeCoverImage(file)
+                            setDrawerBrandDraft(s => ({
+                              ...s,
+                              newCoverFile: resized,
+                              removeCover: false,
+                            }))
+                            pushToast('success', 'Cover image auto-resized to 1120×640')
+                          } catch (err) {
+                            const message =
+                              err instanceof Error
+                                ? err.message
+                                : 'Unable to process cover image. Please try a different file.'
                             setDrawerBrandDraft(s => ({ ...s, newCoverFile: null }))
-                            pushToast('error', validation.error || 'Invalid cover image')
+                            pushToast('error', message)
                             e.target.value = ''
-                            return
                           }
-
-                          setDrawerBrandDraft(s => ({ ...s, newCoverFile: file, removeCover: false }))
                         }}
                       />
                       {brands.find(b => b.id === drawerBrandId)?.cover_url && (
