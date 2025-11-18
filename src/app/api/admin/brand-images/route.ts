@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin/server-auth'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { validateCoverImageDimensions } from '@/lib/image-dimensions'
+
+export const runtime = 'nodejs'
 
 // POST - Upload brand logo/cover
 // multipart/form-data: brand_id, type('logo'|'cover'), file, optional old_url
@@ -19,6 +22,17 @@ export async function POST(request: NextRequest) {
 
     if (!brandId || !file || (type !== 'logo' && type !== 'cover')) {
       return NextResponse.json({ error: 'brand_id, type, and file are required' }, { status: 400 })
+    }
+
+    // Enforce standardized dimensions and aspect ratio for cover images
+    if (type === 'cover') {
+      const dimensionValidation = await validateCoverImageDimensions(file)
+      if (!dimensionValidation.valid) {
+        return NextResponse.json(
+          { error: dimensionValidation.error },
+          { status: 400 }
+        )
+      }
     }
 
     const cookieStore = await cookies()

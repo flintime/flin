@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin/server-auth'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { validateCoverImageDimensions } from '@/lib/image-dimensions'
+
+export const runtime = 'nodejs'
 
 // Accepts multipart/form-data with fields:
 // - vendor_id: string (required)
@@ -41,6 +44,17 @@ export async function POST(request: NextRequest) {
         { error: 'File too large. Maximum size is 5MB' },
         { status: 400 }
       )
+    }
+
+    // Enforce standardized dimensions and aspect ratio for cover images
+    if (type === 'cover') {
+      const dimensionValidation = await validateCoverImageDimensions(file)
+      if (!dimensionValidation.valid) {
+        return NextResponse.json(
+          { error: dimensionValidation.error },
+          { status: 400 }
+        )
+      }
     }
 
     // Create authenticated Supabase client using admin's session cookies

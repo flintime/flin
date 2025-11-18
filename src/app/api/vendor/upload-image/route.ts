@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
+import { validateCoverImageDimensions } from '@/lib/image-dimensions'
+
+export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,6 +64,17 @@ export async function POST(request: NextRequest) {
         { error: 'File too large. Maximum size is 5MB' },
         { status: 400 }
       )
+    }
+
+    // Enforce standardized dimensions and aspect ratio for cover images
+    if (imageType === 'cover') {
+      const dimensionValidation = await validateCoverImageDimensions(file)
+      if (!dimensionValidation.valid) {
+        return NextResponse.json(
+          { error: dimensionValidation.error },
+          { status: 400 }
+        )
+      }
     }
 
     // Find vendor

@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
+    "@sentry/nextjs": "^8.50.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.55.0",
-    "@sentry/nextjs": "^8.50.0",
+    "image-size": "^2.0.2",
     "lucide-react": "^0.539.0",
     "next": "15.4.6",
     "react": "19.1.0",

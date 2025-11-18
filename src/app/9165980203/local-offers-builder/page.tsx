@@ -44,6 +44,52 @@ type VendorImageItem = {
 }
 
 export default function AdminLocalOffersBuilder() {
+  async function validateCoverImageClient(file: File): Promise<{ valid: boolean; error?: string }> {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file)
+      const img = new Image()
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const width = img.naturalWidth
+        const height = img.naturalHeight
+
+        const minWidth = 1120
+        const minHeight = 640
+        const targetAspect = 7 / 4
+        const tolerance = 0.05
+
+        if (width < minWidth || height < minHeight) {
+          resolve({
+            valid: false,
+            error: `Image is too small. Minimum size is ${minWidth}x${minHeight}px.`,
+          })
+          return
+        }
+
+        const aspect = width / height
+        const diff = Math.abs(aspect - targetAspect)
+        if (diff > tolerance) {
+          resolve({
+            valid: false,
+            error:
+              'Image must be a landscape cover in approximately 7:4 (≈16:9) aspect ratio and at least 1120x640px.',
+          })
+          return
+        }
+
+        resolve({ valid: true })
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        resolve({
+          valid: false,
+          error: 'Unable to read image dimensions. Please upload a standard JPEG, PNG, or WebP file.',
+        })
+      }
+      img.src = url
+    })
+  }
+
   function getCookie(name: string): string | undefined {
     if (typeof document === 'undefined') return undefined
     const value = `; ${document.cookie}`
@@ -1024,9 +1070,23 @@ export default function AdminLocalOffersBuilder() {
                   accept="image/*"
                   multiple
                   className="hidden"
-                  onChange={e => {
+                  onChange={async e => {
                     const files = Array.from(e.target.files || [])
-                    setCoverFiles(prev => [...prev, ...files])
+                    const validFiles: File[] = []
+
+                    for (const file of files) {
+                      const validation = await validateCoverImageClient(file)
+                      if (!validation.valid) {
+                        pushToast('error', validation.error || `Invalid cover image: ${file.name}`)
+                      } else {
+                        validFiles.push(file)
+                      }
+                    }
+
+                    if (validFiles.length > 0) {
+                      setCoverFiles(prev => [...prev, ...validFiles])
+                    }
+                    e.target.value = ''
                   }}
                 />
                 <span>Click to upload cover images</span>
@@ -1052,7 +1112,9 @@ export default function AdminLocalOffersBuilder() {
                   ))}
                 </div>
               )}
-              <p className="text-xs text-gray-500 mt-1">You can select multiple images. First image will be primary. Suggested 1200×400 (JPG/PNG)</p>
+              <p className="text-xs text-gray-500 mt-1">
+                You can select multiple images. First image will be primary. Suggested landscape 7:4 (≈16:9) at least 1120x640px (JPG/PNG/WebP).
+              </p>
             </div>
           </div>
 
@@ -1553,9 +1615,23 @@ export default function AdminLocalOffersBuilder() {
                         accept="image/*"
                         multiple
                         className="border rounded px-3 py-2 w-full text-sm"
-                        onChange={e => {
+                        onChange={async e => {
                           const files = Array.from(e.target.files || [])
-                          setDrawerVendorDraft(s => ({ ...s, newCoverFiles: files }))
+                          const validFiles: File[] = []
+
+                          for (const file of files) {
+                            const validation = await validateCoverImageClient(file)
+                            if (!validation.valid) {
+                              pushToast('error', validation.error || `Invalid cover image: ${file.name}`)
+                            } else {
+                              validFiles.push(file)
+                            }
+                          }
+
+                          if (validFiles.length > 0) {
+                            setDrawerVendorDraft(s => ({ ...s, newCoverFiles: validFiles }))
+                          }
+                          e.target.value = ''
                         }}
                       />
                       <p className="text-xs text-gray-500 mt-1">You can select multiple images</p>

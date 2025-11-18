@@ -37,6 +37,52 @@ export default function AdminBrandBuilder() {
   
   // slugify removed (unused)
 
+  async function validateCoverImageClient(file: File): Promise<{ valid: boolean; error?: string }> {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file)
+      const img = new Image()
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const width = img.naturalWidth
+        const height = img.naturalHeight
+
+        const minWidth = 1120
+        const minHeight = 640
+        const targetAspect = 7 / 4
+        const tolerance = 0.05
+
+        if (width < minWidth || height < minHeight) {
+          resolve({
+            valid: false,
+            error: `Image is too small. Minimum size is ${minWidth}x${minHeight}px.`,
+          })
+          return
+        }
+
+        const aspect = width / height
+        const diff = Math.abs(aspect - targetAspect)
+        if (diff > tolerance) {
+          resolve({
+            valid: false,
+            error:
+              'Image must be a landscape cover in approximately 7:4 (≈16:9) aspect ratio and at least 1120x640px.',
+          })
+          return
+        }
+
+        resolve({ valid: true })
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        resolve({
+          valid: false,
+          error: 'Unable to read image dimensions. Please upload a standard JPEG, PNG, or WebP file.',
+        })
+      }
+      img.src = url
+    })
+  }
+
   function getCookie(name: string): string | undefined {
     if (typeof document === 'undefined') return undefined
     const value = `; ${document.cookie}`
@@ -722,7 +768,29 @@ export default function AdminBrandBuilder() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cover image <span className="text-red-600">*</span></label>
               <label className="flex items-center justify-center border border-dashed rounded-lg px-3 py-6 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-                <input type="file" accept="image/*" className="hidden" onChange={e => setCoverFile(e.target.files?.[0] || null)} required />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async e => {
+                  const file = e.target.files?.[0] || null
+                  if (!file) {
+                    setCoverFile(null)
+                    return
+                  }
+
+                  const validation = await validateCoverImageClient(file)
+                  if (!validation.valid) {
+                    setCoverFile(null)
+                    pushToast('error', validation.error || 'Invalid cover image')
+                    e.target.value = ''
+                    return
+                  }
+
+                  setCoverFile(file)
+                }}
+                required
+              />
                 <span>{coverFile ? `Selected: ${coverFile.name}` : 'Click to upload cover'}</span>
               </label>
               {coverFile && (
@@ -743,7 +811,9 @@ export default function AdminBrandBuilder() {
                   </button>
                 </div>
               )}
-              <p className="text-xs text-gray-500 mt-1">Suggested 1200×400 (JPG/PNG)</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Suggested landscape 7:4 (≈16:9) at least 1120x640px (JPG/PNG/WebP).
+              </p>
             </div>
           </div>
 
@@ -1155,7 +1225,23 @@ export default function AdminBrandBuilder() {
                         type="file"
                         accept="image/*"
                         className="border rounded px-3 py-2 w-full text-sm"
-                        onChange={e => setDrawerBrandDraft(s => ({ ...s, newCoverFile: e.target.files?.[0] || null, removeCover: false }))}
+                        onChange={async e => {
+                          const file = e.target.files?.[0] || null
+                          if (!file) {
+                            setDrawerBrandDraft(s => ({ ...s, newCoverFile: null }))
+                            return
+                          }
+
+                          const validation = await validateCoverImageClient(file)
+                          if (!validation.valid) {
+                            setDrawerBrandDraft(s => ({ ...s, newCoverFile: null }))
+                            pushToast('error', validation.error || 'Invalid cover image')
+                            e.target.value = ''
+                            return
+                          }
+
+                          setDrawerBrandDraft(s => ({ ...s, newCoverFile: file, removeCover: false }))
+                        }}
                       />
                       {brands.find(b => b.id === drawerBrandId)?.cover_url && (
                         <label className="inline-flex items-center gap-2 text-sm">
